@@ -1,12 +1,47 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <link href='../css/resultpage.css' rel='stylesheet'>
+    <meta charset = 'utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <title>Results</title>
+    <link rel='stylesheet' href='../css/resultpage.css'/>
+    <link rel='stylesheet' href='../themes/plain.min.css'/>
+    <link rel='stylesheet' href='../themes/jquery.mobile.icons.min.css'/>
+    <link rel='stylesheet' href='http://code.jquery.com/mobile/1.4.3/jquery.mobile.structure-1.4.3.min.css' />
+    <script src='http://code.jquery.com/jquery-1.11.1.min.js'></script>
+    <script src='http://code.jquery.com/mobile/1.4.3/jquery.mobile-1.4.3.min.js'></script>
     <script src='https://maps.googleapis.com/maps/api/js' +
     '?key=AIzaSyBBsbcZWi9NmRSBp1ISIikmYbliZVHvcEA'></script>
     <script src='../js/result-map.js'></script>
   </head>
   <body>
-    <div id='map-canvas'></div>
+    <div data-role='page' id='map-page' data-url='map-page'>
+      <div data-role='header'  data-theme='a'>
+        <h1>Choose to eat from:</h1>
+      </div>
+      <div class='ui-body' id='map-body'>
+        <div role='main' class='ui-content' id='map-canvas'>
+        </div>
+      </div>
+      <div class='ui-body'>
+        <ul data-role="listview" data-inset="true">
+            <li><a href="#">Burger Shack</a></li>
+            <li><a href="#">Salad Bar</a></li>
+            <li><a href="#">Seafood Place</a></li>
+            <li><a href="#">Cheap Alcohol</a></li>
+            <li><a href="#">Expensive Restaurant</a></li>
+        </ul>
+      </div>
+      <div data-role="footer" data-id="foo1" data-position="fixed">
+      	<div data-role="navbar">
+      		<ul>
+      			<li><a href="#">Home</a></li>
+      			<li><a href="#">Contacts</a></li>
+      			<li><a href="#">Example</a></li>
+      			<li><a href="#">Example</a></li>
+      		</ul>
+      	</div><!-- /navbar -->
+      </div>
+    </div>
   </body>
 </html>
