@@ -2,25 +2,42 @@
 <head>
     <meta charset = 'utf-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
-    <title>Le Test Page</title>
+    <title>Le Skeleton Page</title>
     
     <link rel='stylesheet' href='../themes/plain.min.css'/>
     <link rel='stylesheet' href='../themes/jquery.mobile.icons.min.css'/>
     <link rel='stylesheet' href='http://code.jquery.com/mobile/1.4.3/jquery.mobile.structure-1.4.3.min.css' />
     <script src='http://code.jquery.com/jquery-1.11.1.min.js'></script>
     <script src='http://code.jquery.com/mobile/1.4.3/jquery.mobile-1.4.3.min.js'></script>
-
+	
+	<script>
+		function conquestsEditButton(pointer) {
+			if (pointer.text() == "Edit") {
+				pointer.text("Done");
+				$('#conquestsList').children().children().next().css('display', 'inline');
+				$('#conquestsTopRightButton1').css('display', 'none');
+				$('#conquestsTopRightButton2').css('display', 'inline');
+			} else {
+				pointer.text("Edit");
+				$('#conquestsList').children().children().next().css('display', 'none');
+				$('#conquestsTopRightButton1').css('display', 'inline');
+				$('#conquestsTopRightButton2').css('display', 'none');
+			}
+		}
+	</script>
   </head>
  
  <body>
+ 
+ <div data-role="page" id="PageOne">
  
  <div data-role="tabs" style="overflow:hidden;">
 
  <div data-role="footer" data-position="fixed" data-tap-toggle="false" data-hide-during-focus="">
         <div data-role="navbar">
             <ul>
-                <li><a href="#one"  data-icon="star" class="ui-btn-active">Favorites</a></li>
-                <li><a href="#two"  data-icon="user">Friends</a></li>
+                <li><a href="#one" data-icon="star" class="ui-btn-active">Favorites</a></li>
+                <li><a href="#two" data-icon="user">Friends</a></li>
                 <li><a href="#three" data-icon="bars">Conquests</a></li>
 				<li><a href="#four" data-icon="gear">Settings</a></li>
             </ul>
@@ -32,8 +49,26 @@
 			<h1><center>Favorites</center></h1>
 			<a href="#" data-icon="gear" class="ui-btn-right">Options</a>
 		</div>
-		1
+		
+		<a href="#popupLogin" data-transition="slideUp" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-icon-check ui-btn-icon-left ui-btn-a" data-transition="pop">Sign in</a>
+			<div data-role="popup" id="popupLogin" data-theme="a" class="ui-corner-all">
+			<form>
+				<div style="padding:10px 20px;">
+            <h3>Please sign in</h3>
+            <label for="un" class="ui-hidden-accessible">Username:</label>
+            <input type="text" name="user" id="un" value="" placeholder="username" data-theme="a">
+            <label for="pw" class="ui-hidden-accessible">Password:</label>
+            <input type="password" name="pass" id="pw" value="" placeholder="password" data-theme="a">
+            <button type="submit" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check">Sign in</button>
+					</div>
+					</form>
+					</div>
+					
+		<a href="#PageTwo" data-transition="SlideUp">GO PAGE TWO</a>
+		
 	</div>
+	
+	
 		
 	<div id="two">
 		<div data-role="header">
@@ -55,17 +90,18 @@
 	<div id="three">
 		<div data-role="header">
 			<h1><center>Conquests</center></h1>
-			<a href="#" class="ui-btn-left">Edit</a>
-			<a href="#" data-icon="action" class="ui-btn-right" data-iconpos="notext"></a>
+			<a href="#" class="ui-btn-left" onclick="conquestsEditButton($(this))">Edit</a>
+			<a href="#" id="conquestsTopRightButton1" data-icon="action" class="ui-btn-right" data-iconpos="notext"></a>
+			<a href="#" id="conquestsTopRightButton2" class="ui-btn-right" style="display:none">Delete All</a>
 		</div>
 		
-		<ul data-role="listview" data-filter="true" data-filter-placeholder="Search" data-inset="true">
-			<li><a href="#">Conquest 1</a></li>
-			<li><a href="#">Conquest 2</a></li>
-			<li><a href="#">Conquest 3</a></li>
-			<li><a href="#">Conquest 4</a></li>
-			<li><a href="#">Conquest 5</a></li>
-			<li><a href="#">Conquest 6</a></li>
+		<ul id="conquestsList" data-role="listview" data-filter="true" data-filter-placeholder="Search" data-inset="true" data-icon="false" data-split-icon="delete">
+			<li><a style="margin-right:0" href="#">Conquest 1</a><a style="display:none" href="#"></a></li>
+			<li><a style="margin-right:0" href="#">Conquest 2</a><a style="display:none" href="#"></a></li>
+			<li><a style="margin-right:0" href="#">Conquest 3</a><a style="display:none" href="#"></a></li>
+			<li><a style="margin-right:0" href="#">Conquest 4</a><a style="display:none" href="#"></a></li>
+			<li><a style="margin-right:0" href="#">Conquest 5</a><a style="display:none" href="#"></a></li>
+			<li><a style="margin-right:0" href="#">Conquest 6</a><a style="display:none" href="#"></a></li>
 		</ul>
 	</div>
 		
@@ -79,6 +115,13 @@
 	
   
 </div><!-- /footer -->
+
+</div>
+
+<div data-role="page" id="PageTwo">
+hihihi
+<a href="#PageOne">Go Back!</a>
+</div>
 
 </body>
 
