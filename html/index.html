@@ -1,0 +1,89 @@
+<html>
+<head>
+    <meta charset = 'utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <title>Le Test Page</title>
+    
+    <link rel='stylesheet' href='../themes/plain.min.css'/>
+    <link rel='stylesheet' href='../themes/jquery.mobile.icons.min.css'/>
+    <link rel='stylesheet' href='http://code.jquery.com/mobile/1.4.3/jquery.mobile.structure-1.4.3.min.css' />
+    <script src='http://code.jquery.com/jquery-1.11.1.min.js'></script>
+    <script src='http://code.jquery.com/mobile/1.4.3/jquery.mobile-1.4.3.min.js'></script>
+
+  </head>
+ 
+ <body>
+ 
+ <div data-role="tabs" style="overflow:hidden;">
+
+ <div data-role="footer" data-position="fixed" data-tap-toggle="false" data-hide-during-focus="">
+        <div data-role="navbar">
+            <ul>
+                <li><a href="#one"  data-icon="star" class="ui-btn-active">Favorites</a></li>
+                <li><a href="#two"  data-icon="user">Friends</a></li>
+                <li><a href="#three" data-icon="bars">Conquests</a></li>
+				<li><a href="#four" data-icon="gear">Settings</a></li>
+            </ul>
+        </div><!-- /navbar -->
+	</div>
+	
+	<div id="one">
+		<div data-role="header">
+			<h1><center>Favorites</center></h1>
+			<a href="#" data-icon="gear" class="ui-btn-right">Options</a>
+		</div>
+		1
+	</div>
+		
+	<div id="two">
+		<div data-role="header">
+			<h1><center>Friends</center></h1>
+			<a href="#" data-icon="plus" class="ui-btn-right" data-iconpos="notext"></a>
+		</div>
+		
+		<ul data-role="listview" data-autodividers="true" data-filter="true" data-filter-placeholder="Search" data-inset="true">
+			<li><a href="#">Adam Kinkaid</a></li>
+			<li><a href="#">Alex Wickerham</a></li>
+			<li><a href="#">Avery Johnson</a></li>
+			<li><a href="#">Bob Cabot</a></li>
+			<li><a href="#">Caleb Booth</a></li>
+			<li><a href="#">Christopher Adams</a></li>
+			<li><a href="#">Culver James</a></li>
+	</ul>
+	</div>
+		
+	<div id="three">
+		<div data-role="header">
+			<h1><center>Conquests</center></h1>
+			<a href="#" class="ui-btn-left">Edit</a>
+			<a href="#" data-icon="action" class="ui-btn-right" data-iconpos="notext"></a>
+		</div>
+		
+		<ul data-role="listview" data-filter="true" data-filter-placeholder="Search" data-inset="true">
+			<li><a href="#">Conquest 1</a></li>
+			<li><a href="#">Conquest 2</a></li>
+			<li><a href="#">Conquest 3</a></li>
+			<li><a href="#">Conquest 4</a></li>
+			<li><a href="#">Conquest 5</a></li>
+			<li><a href="#">Conquest 6</a></li>
+		</ul>
+	</div>
+		
+	<div id="four">
+		<div data-role="header">
+			<h1><center>Settings</center></h1>
+		</div>
+		4
+	</div>
+	
+	
+  
+</div><!-- /footer -->
+
+</body>
+
+<footer>
+
+</footer>
+
+</html>
