@@ -48,10 +48,13 @@ var users = [
   {'lat':1.3075, 'lng':103.78}
 ]
 
+
 function onMapLoad(){
+
+  var user_markers = [];
+
   $(document).ready(function(){
 
-    var user_markers = [];
     var direction_renderers = [];
 
     //Inside a get to the server to get details or just names
@@ -74,6 +77,7 @@ function onMapLoad(){
       var latLng = new google.maps.LatLng(
         users[i].lat, users[i].lng
       )
+
       user_markers.push(new google.maps.Marker({
         position: latLng,
         icon: userPinImage,
@@ -82,14 +86,15 @@ function onMapLoad(){
     }
 
 
-
     function generatePolyline(){
       return new google.maps.Polyline({
           strokeColor: polylineColors[polylineIndex++],
-          strokeOpacity: 0.5,
-          strokeWeight: 8
+          strokeOpacity: 0.7,
+          strokeWeight: 5
       });
     }
+
+    //Need to optimise soon!
 
     $('#option-list li').click(function(){
       var index = parseInt($(this).attr('option-index'));
@@ -106,8 +111,18 @@ function onMapLoad(){
         animation: google.maps.Animation.DROP,
       });
 
-
       place_marker.setMap(map);
+
+      var bound = new google.maps.LatLngBounds();
+
+      for (var i=0; i<user_markers.length; i++){
+        bound.extend(user_markers[i].position);
+      }
+
+      bound.extend(place_marker.position);
+
+      map.setCenter(bound.getCenter());
+      map.fitBounds(bound);
 
       polylineIndex = 0;
       for(var i=0;i<direction_renderers.length;i++){
@@ -116,6 +131,7 @@ function onMapLoad(){
       direction_renderers = [];
 
       for(var i=0;i<user_markers.length;i++){
+
         var request = {
           origin: place_marker.position,
           destination: user_markers[i].position,
@@ -126,11 +142,14 @@ function onMapLoad(){
           if (status === google.maps.DirectionsStatus.OK) {
             var directionRenderer = new google.maps.DirectionsRenderer({
               suppressMarkers: true,
-              polylineOptions: generatePolyline()
+              polylineOptions: generatePolyline(),
+              preserveViewport: true
             });
             directionRenderer.setMap(map);
             directionRenderer.setDirections(response);
             direction_renderers.push(directionRenderer);
+          } else {
+            //Over query limit error to be handled.
           }
         });
       }
