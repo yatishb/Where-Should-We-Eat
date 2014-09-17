@@ -52,6 +52,8 @@ var users = [
 function onMapLoad(){
 
   var user_markers = [];
+  var directionsMatrix = []
+
 
   $(document).ready(function(){
 
@@ -63,6 +65,7 @@ function onMapLoad(){
         '<li option-index=' + i + '><a href="#">'
         + details[i].name + '</a></li>'
       );
+      directionsMatrix.push([]);
     }
     $('#option-list').listview('refresh');
 
@@ -83,6 +86,7 @@ function onMapLoad(){
         icon: userPinImage,
         map: map
       }));
+
     }
 
 
@@ -94,10 +98,14 @@ function onMapLoad(){
       });
     }
 
+
+
     //Need to optimise soon!
 
     $('#option-list li').click(function(){
       var index = parseInt($(this).attr('option-index'));
+
+
       var option_details = details[index]; //Replace with API get
 
       var myLatLng = new google.maps.LatLng(
@@ -130,30 +138,54 @@ function onMapLoad(){
       }
       direction_renderers = [];
 
-      for(var i=0;i<user_markers.length;i++){
 
-        var request = {
-          origin: place_marker.position,
-          destination: user_markers[i].position,
-          travelMode: google.maps.TravelMode.DRIVING
+      if(directionsMatrix[index].length === 0){
+        var i = 0;
+
+        function syncLoop(){
+
+          setTimeout(function() {
+            var request = {
+              origin: place_marker.position,
+              destination: user_markers[i].position,
+              travelMode: google.maps.TravelMode.DRIVING
+            }
+            directionsService.route(request, function(response, status){
+              if (status === google.maps.DirectionsStatus.OK) {
+                var directionRenderer = new google.maps.DirectionsRenderer({
+                  suppressMarkers: true,
+                  polylineOptions: generatePolyline(),
+                  preserveViewport: true
+                });
+                directionRenderer.setDirections(response);
+                directionsMatrix[index].push(directionRenderer);
+                directionRenderer.setMap(map);
+                direction_renderers.push(directionRenderer);
+
+              } else {
+                //Over query limit error to be handled.
+              }
+            });
+
+            i++;
+            if(i<user_markers.length){
+              syncLoop();
+            }
+
+          }, 200);
         }
 
-        directionsService.route(request, function(response, status){
-          if (status === google.maps.DirectionsStatus.OK) {
-            var directionRenderer = new google.maps.DirectionsRenderer({
-              suppressMarkers: true,
-              polylineOptions: generatePolyline(),
-              preserveViewport: true
-            });
-            directionRenderer.setMap(map);
-            directionRenderer.setDirections(response);
-            direction_renderers.push(directionRenderer);
-          } else {
-            //Over query limit error to be handled.
+        syncLoop();
+
+      } else {
+          for(var i=0; i<directionsMatrix[index].length; i++){
+            directionsMatrix[index][i].setMap(map);
+            direction_renderers.push(directionsMatrix[index][i]);
           }
-        });
       }
+
     });
 
   });
+
 }
