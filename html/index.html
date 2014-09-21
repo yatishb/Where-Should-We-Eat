@@ -11,7 +11,8 @@
     <script src='http://code.jquery.com/mobile/1.4.3/jquery.mobile-1.4.3.min.js'></script>
 	
 	<script>
-		function conquestsEditButton(pointer) {
+		function conquestsEditOnclick() {
+			pointer = $('#conquestsEditButton');
 			if (pointer.text() == "Edit") {
 				pointer.text("Done");
 				$('#conquestsList').children().children().next().css('display', 'inline');
@@ -24,6 +25,22 @@
 				$('#conquestsTopRightButton2').css('display', 'none');
 			}
 		}
+		
+		function togglePartyView() {
+			if ($.trim($('#requestParty').val()) != "" ) {
+				$('#chosenParty').css('display','none');
+			} else {
+				$('#chosenParty').css('display','inline');
+			}
+		}
+		
+		// run
+		$(document).on('click', '.ui-input-clear', function () {
+			togglePartyView();
+		});
+		
+	
+		
 	</script>
   </head>
  
@@ -73,7 +90,7 @@
 	<div id="two">
 		<div data-role="header">
 			<h1><center>Friends</center></h1>
-			<a href="#" data-icon="plus" class="ui-btn-right" data-iconpos="notext"></a>
+			<a href="#NewFriend" data-icon="plus" class="ui-btn-right" data-iconpos="notext" data-transition="slideUp"></a>
 		</div>
 		
 		<ul data-role="listview" data-autodividers="true" data-filter="true" data-filter-placeholder="Search" data-inset="true">
@@ -84,19 +101,33 @@
 			<li><a href="#">Caleb Booth</a></li>
 			<li><a href="#">Christopher Adams</a></li>
 			<li><a href="#">Culver James</a></li>
-	</ul>
+		</ul>
+	
+	
 	</div>
 		
 	<div id="three">
 		<div data-role="header">
 			<h1><center>Conquests</center></h1>
-			<a href="#" class="ui-btn-left" onclick="conquestsEditButton($(this))">Edit</a>
-			<a href="#" id="conquestsTopRightButton1" data-icon="action" class="ui-btn-right" data-iconpos="notext"></a>
-			<a href="#" id="conquestsTopRightButton2" class="ui-btn-right" style="display:none">Delete All</a>
+			<a href="#" id="conquestsEditButton" class="ui-btn-left" onclick="conquestsEditOnclick()">Edit</a>
+			<a href="#NewConquestOne" id="conquestsTopRightButton1" data-icon="action" class="ui-btn-right" data-iconpos="notext"></a>
+			<a href="#DeleteAllConquests" data-rel="popup" data-position-to="window" id="conquestsTopRightButton2" class="ui-btn-right" style="display:none">Delete All</a>
+			
+			<div data-role="popup" id="DeleteAllConquests" data-overlay-theme="a" data-theme="a" class="ui-corner-all" data-dismissible="false">
+				<div data-role="header" data-theme="a">
+					<h1>Delete All?</h1>
+				</div>
+				<div role="main" class="ui-content">
+					<h3 class="ui-title">Are you sure you want to delete errthing?</h3>
+					<p>This action cannot be undone.</p>
+					<a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back" onclick="conquestsEditOnclick()">Back</a>
+					<a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back" data-transition="flow">Delete</a>
+				</div>
+			</div>
 		</div>
 		
 		<ul id="conquestsList" data-role="listview" data-filter="true" data-filter-placeholder="Search" data-inset="true" data-icon="false" data-split-icon="delete">
-			<li><a style="margin-right:0" href="#">Conquest 1</a><a style="display:none" href="#"></a></li>
+			<li><a style="margin-right:0" href="#ConquestDetails">Conquest 1</a><a style="display:none" href="#"></a></li>
 			<li><a style="margin-right:0" href="#">Conquest 2</a><a style="display:none" href="#"></a></li>
 			<li><a style="margin-right:0" href="#">Conquest 3</a><a style="display:none" href="#"></a></li>
 			<li><a style="margin-right:0" href="#">Conquest 4</a><a style="display:none" href="#"></a></li>
@@ -122,6 +153,189 @@
 hihihi
 <a href="#PageOne">Go Back!</a>
 </div>
+
+<div data-role="page" id="ConquestDetails">
+	<div data-role="header">
+		<h1><center>Some Header</center></h1>
+		<a href="#" class="ui-btn-left" data-icon="back" data-rel="back">Back</a>
+	</div>
+	
+	<p>
+	<h3><center>DATETIME</center></h3>
+	</p>
+	
+	<p>
+		<ul data-role="listview" data-inset="true">
+			<li><a href="#ConquestDungeon">
+				<img src="http://demos.jquerymobile.com/1.4.4/_assets/img/album-bb.jpg">
+			<h2>Restaurant Name</h2>
+		<p>some details, address, postal code, etc.</p></a>
+			</li>
+	</p>
+	
+	Party Members:
+	<p>
+		<ul data-role="listview" data-inset="true">
+			<li><a href="#ConquestParty"><div style="float:left">Adam Kinkaid</div><div style="float:right">$50</div></a></li>
+			<li><a href="#">Alex Wickerham</a></li>
+			<li><a href="#">Avery Johnson</a></li>
+			<li><a href="#">Bob Cabot</a></li>
+			<li><a href="#">Caleb Booth</a></li>
+			<li><a href="#">Christopher Adams</a></li>
+			<li><a href="#">Culver James</a></li>
+		</ul>
+	</p>
+	
+	<a href="#" class="ui-btn ui-btn-inline">new lazy search</a>
+	<a href="#popupInfo" data-rel="popup" data-transition="pop" class="ui-btn ui-icon-info ui-btn-icon-notext ui-corner-all ui-btn-inline"></a>
+	<div data-role="popup" id="popupInfo" class="ui-content" data-theme="a" style="max-width:350px;">
+		<p>
+			Explanation on what lazy search is.
+		</p>
+	</div>
+	
+</div>
+
+<div data-role="page" id="ConquestDungeon">
+	<div data-role="header">
+		<h1><center>Some Header</center></h1>
+		<a href="#" class="ui-btn-left" data-icon="back" data-rel="back">Back</a>
+	</div>
+	
+	<p>
+		(probably need to style this) <br>
+		Either we overlay with a pic of the maps, or have an actual working page like this with a working map with pre-filled markers.
+	</p>
+	
+</div>
+
+<div data-role="page" id="ConquestParty">
+	<div data-role="header">
+		<h1><center>Some Header</center></h1>
+		<a href="#" class="ui-btn-left" data-icon="back" data-rel="back">Back</a>
+	</div>
+	
+	<p>
+		(probably need to style this) <br>
+		Info about stuff, including specifics w.r.t this particular conquest.
+	</p>
+	
+</div>
+
+<div data-role="page" id="NewConquestOne">
+	<div data-role="header">
+		<h1><center>Select Party</center></h1>
+		<a href="#" class="ui-btn-left" data-icon="back" data-rel="back" data-iconpos="notext">Back</a>
+		<a href="#NewConquestTwo" class="ui-btn-right" data-icon="arrow-r" data-iconpos="notext">Next</a>
+	</div>
+	
+	<form class="ui-filterable">
+		<input id="requestParty" data-type="search" placeholder="Enter Postal Code or Name" oninput="togglePartyView()">
+	</form>
+	<ul data-role="listview" data-filter="true" data-filter-reveal="true" data-input="#requestParty" data-inset="true">
+	 <!-- If you click on da links, it gets added. Links are from contact-book -->
+		<li><a href="#" onclick="alert('This gets added to the list below')">Demon Hunter</a></li>
+		<li><a href="#">Monk</a></li>
+		<li><a href="#">Barbarian</a></li>
+		<li><a href="#">Crusader</a></li>
+		<li><a href="#">Necromancer</a></li>
+		<li><a href="#">Assassin</a></li>
+	</ul>
+	
+	<ul data-role="listview" id="chosenParty" style="display:inline">
+	<!-- Need to implement swipe-to-delete functionality for chosen party -->
+		<li>Warrior</li>
+		<li>Wizard</li>
+		<li>Cleric</li>
+		<li>Ranger</li>
+	</ul>
+	
+	
+</div>
+
+<div data-role="page" id="NewConquestTwo">
+	<div data-role="header">
+		<h1><center>Select Dungeon</center></h1>
+		<a href="#" class="ui-btn-left" data-icon="arrow-l" data-rel="back" data-iconpos="notext">Back</a>
+		<a href="#ConquestDetailsCreate" class="ui-btn-right" data-icon="arrow-r" data-iconpos="notext">Next</a>
+	</div>
+	
+	<p>(insert map here)</p>
+	
+	Suggestions:
+	<div data-role="collapsibleset" data-inset="true">
+		
+		<!-- per suggestion-->
+		<div data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-iconpos="right">
+		<h2><div style="float:left">Ah Kow Prata House</div><div style="float:right">$200</div></h2>
+		Moar info. including breakdown?
+		</div>
+	
+		<!-- per suggestion-->
+		<div data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-iconpos="right">
+		<h2><div style="float:left">Singapura Supper Restaurant</div><div style="float:right">$250</div></h2>
+		Need to word-wrap this with "..." to not override the moneh$$$
+		</div>
+	</div>
+	
+	
+</div>
+
+<div data-role="page" id="ConquestDetailsCreate">
+	<div data-role="header">
+		<h1><center>Some Header</center></h1>
+		<a href="#" class="ui-btn-left" data-icon="arrow-l" data-rel="back" data-iconpos="notext">Back</a>
+		<a href="#PageOne" class="ui-btn-right" data-icon="check" data-iconpos="notext">Done</a>
+	</div>
+	
+	<p>
+	<h3><center>DATETIME</center></h3>
+	</p>
+	
+	<p>
+		<ul data-role="listview" data-inset="true">
+			<li><a href="#ConquestDungeon">
+				<img src="http://demos.jquerymobile.com/1.4.4/_assets/img/album-bb.jpg">
+			<h2>Restaurant Name</h2>
+		<p>some details, address, postal code, etc.</p></a>
+			</li>
+	</p>
+	
+	Party Members:
+	<p>
+		<ul data-role="listview" data-inset="true">
+			<li><a href="#ConquestParty"><div style="float:left">Adam Kinkaid</div><div style="float:right">$50</div></a></li>
+			<li><a href="#">Alex Wickerham</a></li>
+			<li><a href="#">Avery Johnson</a></li>
+			<li><a href="#">Bob Cabot</a></li>
+			<li><a href="#">Caleb Booth</a></li>
+			<li><a href="#">Christopher Adams</a></li>
+			<li><a href="#">Culver James</a></li>
+		</ul>
+	</p>
+	
+</div>
+
+<div data-role="page" id="NewFriend">
+				
+	<div data-role="header">
+		<h3>New Friend</h3>
+		<a href="#" data-rel="back" data-icon="back" class="ui-btn-left">Cancel</a>
+		<a href="#" data-rel="back" data-icon="check" class="ui-btn-right">Done</a>
+	</div>
+						
+	<form>
+		<div style="padding:10px 20px;">
+			<label for="un" <!--class="ui-hidden-accessible"-->>Name:</label>
+			<input type="text" name="user" id="un" data-clear-btn="true" value="" placeholder="Name" data-theme="a">
+			<label for="pw" <!--class="ui-hidden-accessible"-->>Postal Code:</label>
+			<input type="tel" name="pass" id="pw" data-clear-btn="true" value="" placeholder="Postal Code" data-theme="a">
+		</div>
+	</form>
+</div>
+
+
+
 
 </body>
 
