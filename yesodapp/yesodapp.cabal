@@ -21,6 +21,7 @@ library
                      Settings.Development
                      Handler.Home
                      Handler.GeoCode
+                     Handler.StartSearch
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT
@@ -68,8 +69,9 @@ library
                  , monad-logger                  >= 0.3        && < 0.4
                  , fast-logger                   >= 2.2        && < 2.3
                  , wai-logger                    >= 2.2        && < 2.3
-                 , unordered-containers == 0.2.5.0
-                 , vector == 0.10.11.0
+                 , unordered-containers          == 0.2.5.0
+                 , vector                        == 0.10.11.0
+                 , attoparsec                    == 0.12.1.2
 
     -- see https://github.com/yesodweb/yesod/issues/814
     if !os(windows)
