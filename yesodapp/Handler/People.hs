@@ -2,23 +2,37 @@ module Handler.People where
 
 import Import
 import Data.Aeson.Types
-import Data.Vector as V
+import Data.Maybe (catMaybes)
+import qualified Data.Vector as V
 
 getPeopleR :: SearchesId -> Handler Value
 getPeopleR searchId = do
+  -- read up on http://hackage.haskell.org/package/persistent-1.3.3/docs/Database-Persist-Class.html
+
   -- Get the corresponding row from the Id
-  searchEntries <- runDB $ selectList [SearchesId ==. searchId] [LimitTo 1]
+  maybeSearchEntry <- runDB $ get searchId
 
-  -- TODO: Extract from people column of Searches table
-  --         people :: [PeopleId]
+  case maybeSearchEntry of
+    Nothing -> return $
+      -- TODO: Return some kind of error?
+      object ["people" .= (V.empty :: Array)]
 
-  -- let searchEntry = head searchEntries
-  --     peopleArr = SearchesPeople $ entityVal searchEntries
+    Just searchEntry -> do
+      -- Extract from people column of Searches table
+      --     people :: [PeopleId]
+      let peopleIds = searchesPeople searchEntry
 
-  -- TODO: Then get these entries from the People table,
-  --       and output as JSON.
-  -- Can persistent automatically do JSON? I think so.
+      -- Then get these entries from the People table,
+      --  and output as JSON.
 
-  -- Return {searchId: int}
-  -- Aeson Arrays are Haskell vectors
-  return $ object ["people" .= (V.empty :: Array)]
+      -- [PeopleId] to [Maybe People], then [People] without the Nothing ones
+      maybePeople <- mapM (\pId -> runDB $ get pId) peopleIds
+      let people = catMaybes maybePeople
+
+      -- Can persistent automatically do JSON? I think so.
+
+      -- People {name, postal :: Int, phone Int Maybe, lat, lng}
+
+      -- Return {people: [{name, postal, phone , location {lat, lng}}]}
+      -- Aeson Arrays are Haskell vectors
+      return $ object ["people" .= (V.empty :: Array)]
