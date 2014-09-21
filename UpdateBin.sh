@@ -18,6 +18,10 @@ APPDIR=$HOME/yesod-app
 # Unzip the file
 echo "* Unzipping *"
 gunzip $APPDIR/latest/yesodapp.gz
+echo "** The md5sum is : "
+md5sum $APPDIR/latest/yesodapp
+echo "** Filesize : "
+du -sh $APPDIR/latest/yesodapp
 
 
 
