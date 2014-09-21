@@ -1,0 +1,37 @@
+User
+    ident Text
+    password Text Maybe
+    UniqueUser ident
+    deriving Typeable
+Email
+    email Text
+    user UserId Maybe
+    verkey Text Maybe
+    UniqueEmail email
+People
+    name String
+    postal Int
+    phone Int Maybe
+    lat String
+    lng String
+    deriving Show
+Place
+	name String
+	lat String
+	lng String
+	yelpid String
+	imgurl String
+	deriving Show
+Searches
+    people [PeopleId]
+    filters [String]
+    chosen PlaceId Maybe
+    places [PlaceId]
+    deriving Show
+SearchPlaces
+    searchid SearchesId
+    placeid PlaceId
+    taxifare [Int]
+    deriving Show
+
+ -- By default this file is used in Model.hs (which is imported by Foundation.hs)
