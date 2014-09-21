@@ -8,3 +8,4 @@
 /geocode/#String GeoCodeR GET
 /doSearch StartSearchR POST
 /search/#SearchesId/people PeopleR GET
+/search/#SearchesId/places PlacesR GET

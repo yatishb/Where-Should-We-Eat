@@ -23,6 +23,7 @@ library
                      Handler.GeoCode
                      Handler.StartSearch
                      Handler.People
+                     Handler.Places
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT
