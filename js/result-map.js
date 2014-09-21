@@ -48,10 +48,15 @@ var users = [
   {'lat':1.3075, 'lng':103.78}
 ]
 
+
 function onMapLoad(){
+
+  var user_markers = [];
+  var directionsMatrix = []
+
+
   $(document).ready(function(){
 
-    var user_markers = [];
     var direction_renderers = [];
 
     //Inside a get to the server to get details or just names
@@ -60,6 +65,7 @@ function onMapLoad(){
         '<li option-index=' + i + '><a href="#">'
         + details[i].name + '</a></li>'
       );
+      directionsMatrix.push([]);
     }
     $('#option-list').listview('refresh');
 
@@ -74,25 +80,32 @@ function onMapLoad(){
       var latLng = new google.maps.LatLng(
         users[i].lat, users[i].lng
       )
+
       user_markers.push(new google.maps.Marker({
         position: latLng,
         icon: userPinImage,
         map: map
       }));
-    }
 
+    }
 
 
     function generatePolyline(){
       return new google.maps.Polyline({
           strokeColor: polylineColors[polylineIndex++],
-          strokeOpacity: 0.5,
-          strokeWeight: 8
+          strokeOpacity: 0.7,
+          strokeWeight: 5
       });
     }
 
+
+
+    //Need to optimise soon!
+
     $('#option-list li').click(function(){
       var index = parseInt($(this).attr('option-index'));
+
+
       var option_details = details[index]; //Replace with API get
 
       var myLatLng = new google.maps.LatLng(
@@ -106,8 +119,18 @@ function onMapLoad(){
         animation: google.maps.Animation.DROP,
       });
 
-
       place_marker.setMap(map);
+
+      var bound = new google.maps.LatLngBounds();
+
+      for (var i=0; i<user_markers.length; i++){
+        bound.extend(user_markers[i].position);
+      }
+
+      bound.extend(place_marker.position);
+
+      map.setCenter(bound.getCenter());
+      map.fitBounds(bound);
 
       polylineIndex = 0;
       for(var i=0;i<direction_renderers.length;i++){
@@ -115,26 +138,54 @@ function onMapLoad(){
       }
       direction_renderers = [];
 
-      for(var i=0;i<user_markers.length;i++){
-        var request = {
-          origin: place_marker.position,
-          destination: user_markers[i].position,
-          travelMode: google.maps.TravelMode.DRIVING
+
+      if(directionsMatrix[index].length === 0){
+        var i = 0;
+
+        function syncLoop(){
+
+          setTimeout(function() {
+            var request = {
+              origin: place_marker.position,
+              destination: user_markers[i].position,
+              travelMode: google.maps.TravelMode.DRIVING
+            }
+            directionsService.route(request, function(response, status){
+              if (status === google.maps.DirectionsStatus.OK) {
+                var directionRenderer = new google.maps.DirectionsRenderer({
+                  suppressMarkers: true,
+                  polylineOptions: generatePolyline(),
+                  preserveViewport: true
+                });
+                directionRenderer.setDirections(response);
+                directionsMatrix[index].push(directionRenderer);
+                directionRenderer.setMap(map);
+                direction_renderers.push(directionRenderer);
+
+              } else {
+                //Over query limit error to be handled.
+              }
+            });
+
+            i++;
+            if(i<user_markers.length){
+              syncLoop();
+            }
+
+          }, 200);
         }
 
-        directionsService.route(request, function(response, status){
-          if (status === google.maps.DirectionsStatus.OK) {
-            var directionRenderer = new google.maps.DirectionsRenderer({
-              suppressMarkers: true,
-              polylineOptions: generatePolyline()
-            });
-            directionRenderer.setMap(map);
-            directionRenderer.setDirections(response);
-            direction_renderers.push(directionRenderer);
+        syncLoop();
+
+      } else {
+          for(var i=0; i<directionsMatrix[index].length; i++){
+            directionsMatrix[index][i].setMap(map);
+            direction_renderers.push(directionsMatrix[index][i]);
           }
-        });
       }
+
     });
 
   });
+
 }
