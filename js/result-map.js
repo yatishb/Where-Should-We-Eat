@@ -35,7 +35,7 @@ function init(){
       google.maps.event.trigger(map, "resize");
       map.setCenter(center);
       onMapLoad();
-    } 
+    }
   });
 
 }
@@ -66,7 +66,7 @@ function onMapLoad(){
   var direction_renderers = [];
 
   //Inside a get to the server to get details
-
+  $('#option-list').html('');
   for(var i=0;i<details.length;i++){
     $('#option-list').append(
       '<div data-role="collapsible" data-collapsed-icon="carat-d"'
