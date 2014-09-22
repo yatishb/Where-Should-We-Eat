@@ -54,20 +54,12 @@ postStartSearchR = do
 
   -}
 
-  {- Seems this syntax isn't allowed,
-     so, Persistent / Model doesn't export it?
-  let newSearch = Searches
-                  { people = []
-                  , filters = []
-                  , chosen = Nothing
-                  , places = []
+  let newSearch = Search
+                  { searchPeople = []
+                  , searchFilters = []
+                  , searchChosen = Nothing
+                  , searchPlaces = []
                   }
-  -}
-  let newSearch = Searches
-                  [] -- people
-                  [] -- filters
-                  Nothing -- chosen Maybe
-                  [] -- places
   newSearchId <- runDB $ insert newSearch
 
   -- PersistInt64, which is a PersistValue

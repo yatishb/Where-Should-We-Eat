@@ -8,28 +8,28 @@ Email
     user UserId Maybe
     verkey Text Maybe
     UniqueEmail email
-People
+Person
     name String
     postal Int
     phone Int Maybe
-    lat String
-    lng String
+    location Location
     deriving Show
+    deriving Generic
 Place
-	name String
-	lat String
-	lng String
-	yelpid String
-	imgurl String
-	deriving Show
-Searches
-    people [PeopleId]
+  	name String
+    location Location
+  	yelpid String
+  	imgurl String
+  	deriving Show
+    deriving Generic
+Search
+    people [PersonId]
     filters [String]
     chosen PlaceId Maybe
     places [PlaceId]
     deriving Show
-SearchPlaces
-    searchid SearchesId
+SearchPlace
+    searchid SearchId
     placeid PlaceId
     taxifare [Int]
     deriving Show
