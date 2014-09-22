@@ -3,13 +3,14 @@
     <meta charset = 'utf-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <title>Le Skeleton Page</title>
-    
+
     <link rel='stylesheet' href='../themes/plain.min.css'/>
     <link rel='stylesheet' href='../themes/jquery.mobile.icons.min.css'/>
+    <link rel='stylesheet' href='../css/resultpage.css'/>
     <link rel='stylesheet' href='http://code.jquery.com/mobile/1.4.3/jquery.mobile.structure-1.4.3.min.css' />
     <script src='http://code.jquery.com/jquery-1.11.1.min.js'></script>
     <script src='http://code.jquery.com/mobile/1.4.3/jquery.mobile-1.4.3.min.js'></script>
-	
+
 	<script>
 		function conquestsEditOnclick() {
 			pointer = $('#conquestsEditButton');
@@ -25,7 +26,7 @@
 				$('#conquestsTopRightButton2').css('display', 'none');
 			}
 		}
-		
+
 		function togglePartyView() {
 			if ($.trim($('#requestParty').val()) != "" ) {
 				$('#chosenParty').css('display','none');
@@ -33,21 +34,21 @@
 				$('#chosenParty').css('display','inline');
 			}
 		}
-		
+
 		// run
 		$(document).on('click', '.ui-input-clear', function () {
 			togglePartyView();
 		});
-		
-	
-		
+
+
+
 	</script>
   </head>
- 
+
  <body>
- 
+
  <div data-role="page" id="PageOne">
- 
+
  <div data-role="tabs" style="overflow:hidden;">
 
  <div data-role="footer" data-position="fixed" data-tap-toggle="false" data-hide-during-focus="">
@@ -60,13 +61,13 @@
             </ul>
         </div><!-- /navbar -->
 	</div>
-	
+
 	<div id="one">
 		<div data-role="header">
 			<h1><center>Favorites</center></h1>
 			<a href="#" data-icon="gear" class="ui-btn-right">Options</a>
 		</div>
-		
+
 		<a href="#popupLogin" data-transition="slideUp" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-icon-check ui-btn-icon-left ui-btn-a" data-transition="pop">Sign in</a>
 			<div data-role="popup" id="popupLogin" data-theme="a" class="ui-corner-all">
 			<form>
@@ -80,19 +81,19 @@
 					</div>
 					</form>
 					</div>
-					
+
 		<a href="#PageTwo" data-transition="SlideUp">GO PAGE TWO</a>
-		
+
 	</div>
-	
-	
-		
+
+
+
 	<div id="two">
 		<div data-role="header">
 			<h1><center>Friends</center></h1>
 			<a href="#NewFriend" data-icon="plus" class="ui-btn-right" data-iconpos="notext" data-transition="slideUp"></a>
 		</div>
-		
+
 		<ul data-role="listview" data-autodividers="true" data-filter="true" data-filter-placeholder="Search" data-inset="true">
 			<li><a href="#">Adam Kinkaid</a></li>
 			<li><a href="#">Alex Wickerham</a></li>
@@ -102,17 +103,17 @@
 			<li><a href="#">Christopher Adams</a></li>
 			<li><a href="#">Culver James</a></li>
 		</ul>
-	
-	
+
+
 	</div>
-		
+
 	<div id="three">
 		<div data-role="header">
 			<h1><center>Conquests</center></h1>
 			<a href="#" id="conquestsEditButton" class="ui-btn-left" onclick="conquestsEditOnclick()">Edit</a>
 			<a href="#NewConquestOne" id="conquestsTopRightButton1" data-icon="action" class="ui-btn-right" data-iconpos="notext"></a>
 			<a href="#DeleteAllConquests" data-rel="popup" data-position-to="window" id="conquestsTopRightButton2" class="ui-btn-right" style="display:none">Delete All</a>
-			
+
 			<div data-role="popup" id="DeleteAllConquests" data-overlay-theme="a" data-theme="a" class="ui-corner-all" data-dismissible="false">
 				<div data-role="header" data-theme="a">
 					<h1>Delete All?</h1>
@@ -125,7 +126,7 @@
 				</div>
 			</div>
 		</div>
-		
+
 		<ul id="conquestsList" data-role="listview" data-filter="true" data-filter-placeholder="Search" data-inset="true" data-icon="false" data-split-icon="delete">
 			<li><a style="margin-right:0" href="#ConquestDetails">Conquest 1</a><a style="display:none" href="#"></a></li>
 			<li><a style="margin-right:0" href="#">Conquest 2</a><a style="display:none" href="#"></a></li>
@@ -135,16 +136,16 @@
 			<li><a style="margin-right:0" href="#">Conquest 6</a><a style="display:none" href="#"></a></li>
 		</ul>
 	</div>
-		
+
 	<div id="four">
 		<div data-role="header">
 			<h1><center>Settings</center></h1>
 		</div>
 		4
 	</div>
-	
-	
-  
+
+
+
 </div><!-- /footer -->
 
 </div>
@@ -159,11 +160,11 @@ hihihi
 		<h1><center>Some Header</center></h1>
 		<a href="#" class="ui-btn-left" data-icon="back" data-rel="back">Back</a>
 	</div>
-	
+
 	<p>
 	<h3><center>DATETIME</center></h3>
 	</p>
-	
+
 	<p>
 		<ul data-role="listview" data-inset="true">
 			<li><a href="#ConquestDungeon">
@@ -172,7 +173,7 @@ hihihi
 		<p>some details, address, postal code, etc.</p></a>
 			</li>
 	</p>
-	
+
 	Party Members:
 	<p>
 		<ul data-role="listview" data-inset="true">
@@ -185,7 +186,7 @@ hihihi
 			<li><a href="#">Culver James</a></li>
 		</ul>
 	</p>
-	
+
 	<a href="#" class="ui-btn ui-btn-inline">new lazy search</a>
 	<a href="#popupInfo" data-rel="popup" data-transition="pop" class="ui-btn ui-icon-info ui-btn-icon-notext ui-corner-all ui-btn-inline"></a>
 	<div data-role="popup" id="popupInfo" class="ui-content" data-theme="a" style="max-width:350px;">
@@ -193,7 +194,7 @@ hihihi
 			Explanation on what lazy search is.
 		</p>
 	</div>
-	
+
 </div>
 
 <div data-role="page" id="ConquestDungeon">
@@ -201,12 +202,12 @@ hihihi
 		<h1><center>Some Header</center></h1>
 		<a href="#" class="ui-btn-left" data-icon="back" data-rel="back">Back</a>
 	</div>
-	
+
 	<p>
 		(probably need to style this) <br>
 		Either we overlay with a pic of the maps, or have an actual working page like this with a working map with pre-filled markers.
 	</p>
-	
+
 </div>
 
 <div data-role="page" id="ConquestParty">
@@ -214,12 +215,12 @@ hihihi
 		<h1><center>Some Header</center></h1>
 		<a href="#" class="ui-btn-left" data-icon="back" data-rel="back">Back</a>
 	</div>
-	
+
 	<p>
 		(probably need to style this) <br>
 		Info about stuff, including specifics w.r.t this particular conquest.
 	</p>
-	
+
 </div>
 
 <div data-role="page" id="NewConquestOne">
@@ -228,7 +229,7 @@ hihihi
 		<a href="#" class="ui-btn-left" data-icon="back" data-rel="back" data-iconpos="notext">Back</a>
 		<a href="#NewConquestTwo" class="ui-btn-right" data-icon="arrow-r" data-iconpos="notext">Next</a>
 	</div>
-	
+
 	<form class="ui-filterable">
 		<input id="requestParty" data-type="search" placeholder="Enter Postal Code or Name" oninput="togglePartyView()">
 	</form>
@@ -241,7 +242,7 @@ hihihi
 		<li><a href="#">Necromancer</a></li>
 		<li><a href="#">Assassin</a></li>
 	</ul>
-	
+
 	<ul data-role="listview" id="chosenParty" style="display:inline">
 	<!-- Need to implement swipe-to-delete functionality for chosen party -->
 		<li>Warrior</li>
@@ -249,36 +250,31 @@ hihihi
 		<li>Cleric</li>
 		<li>Ranger</li>
 	</ul>
-	
-	
+
+
 </div>
 
 <div data-role="page" id="NewConquestTwo">
+  <script src='https://maps.googleapis.com/maps/api/js' +
+  '?key=AIzaSyBBsbcZWi9NmRSBp1ISIikmYbliZVHvcEA'></script>
+  <script src='../js/result-map.js'></script>
 	<div data-role="header">
 		<h1><center>Select Dungeon</center></h1>
 		<a href="#" class="ui-btn-left" data-icon="arrow-l" data-rel="back" data-iconpos="notext">Back</a>
 		<a href="#ConquestDetailsCreate" class="ui-btn-right" data-icon="arrow-r" data-iconpos="notext">Next</a>
 	</div>
-	
-	<p>(insert map here)</p>
-	
+
+	<div class='ui-body' id='map-body'>
+    <div role='main' class='ui-content' id='map-canvas'>
+    </div>
+  </div>
+
 	Suggestions:
-	<div data-role="collapsibleset" data-inset="true">
-		
-		<!-- per suggestion-->
-		<div data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-iconpos="right">
-		<h2><div style="float:left">Ah Kow Prata House</div><div style="float:right">$200</div></h2>
-		Moar info. including breakdown?
-		</div>
-	
-		<!-- per suggestion-->
-		<div data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-iconpos="right">
-		<h2><div style="float:left">Singapura Supper Restaurant</div><div style="float:right">$250</div></h2>
-		Need to word-wrap this with "..." to not override the moneh$$$
-		</div>
+	<div data-role="collapsibleset" data-inset="true" id="option-list">
+
 	</div>
-	
-	
+
+
 </div>
 
 <div data-role="page" id="ConquestDetailsCreate">
@@ -287,11 +283,11 @@ hihihi
 		<a href="#" class="ui-btn-left" data-icon="arrow-l" data-rel="back" data-iconpos="notext">Back</a>
 		<a href="#PageOne" class="ui-btn-right" data-icon="check" data-iconpos="notext">Done</a>
 	</div>
-	
+
 	<p>
 	<h3><center>DATETIME</center></h3>
 	</p>
-	
+
 	<p>
 		<ul data-role="listview" data-inset="true">
 			<li><a href="#ConquestDungeon">
@@ -300,7 +296,7 @@ hihihi
 		<p>some details, address, postal code, etc.</p></a>
 			</li>
 	</p>
-	
+
 	Party Members:
 	<p>
 		<ul data-role="listview" data-inset="true">
@@ -313,17 +309,17 @@ hihihi
 			<li><a href="#">Culver James</a></li>
 		</ul>
 	</p>
-	
+
 </div>
 
 <div data-role="page" id="NewFriend">
-				
+
 	<div data-role="header">
 		<h3>New Friend</h3>
 		<a href="#" data-rel="back" data-icon="back" class="ui-btn-left">Cancel</a>
 		<a href="#" data-rel="back" data-icon="check" class="ui-btn-right">Done</a>
 	</div>
-						
+
 	<form>
 		<div style="padding:10px 20px;">
 			<label for="un" <!--class="ui-hidden-accessible"-->>Name:</label>

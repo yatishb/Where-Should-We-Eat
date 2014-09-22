@@ -34,11 +34,11 @@ google.maps.event.addDomListener(window, 'load', init);
 
 
 var details = [
-{'name':'Burger Shack', 'lat':1.308, 'lng':103.82},
-{'name':'Salad Bar', 'lat':1.305, 'lng':103.79},
-{'name':'Seafood Place', 'lat':1.317, 'lng':103.76},
-{'name':'Cheap Alcohol', 'lat':1.303, 'lng':103.81},
-{'name':'Expensive Restaurant', 'lat':1.3, 'lng':103.78}
+{'name':'Burger Shack', 'lat':1.308, 'lng':103.82, 'cost':250, 'info':'Placeholder 1'},
+{'name':'Salad Bar', 'lat':1.305, 'lng':103.79, 'cost':200, 'info':'Placeholder 2'},
+{'name':'Seafood Place', 'lat':1.317, 'lng':103.76, 'cost':350, 'info':'Placeholder 3'},
+{'name':'Cheap Alcohol', 'lat':1.303, 'lng':103.81, 'cost':150, 'info':'Placeholder 4'},
+{'name':'Expensive Restaurant', 'lat':1.3, 'lng':103.78,'cost':280, 'info':'Placeholder 5'}
 ];
 
 var users = [
@@ -59,15 +59,20 @@ function onMapLoad(){
 
     var direction_renderers = [];
 
-    //Inside a get to the server to get details or just names
+    //Inside a get to the server to get details
+
     for(var i=0;i<details.length;i++){
       $('#option-list').append(
-        '<li option-index=' + i + '><a href="#">'
-        + details[i].name + '</a></li>'
+        '<div data-role="collapsible" data-collapsed-icon="carat-d"'
+        + ' data-expanded-icon="carat-u" data-iconpos="right" option-index=' + i + '>'
+        + '<h2><div style="float:left">'
+        + details[i].name + '</div><div style="float:right"> $'
+        + details[i].cost + '</div></h2>'
+        + details[i].info + '</div>'
       );
       directionsMatrix.push([]);
     }
-    $('#option-list').listview('refresh');
+    $('#option-list').collapsibleset('refresh');
 
     //Inside a get request to get lat+lng of users
     var userPinImage = new google.maps.MarkerImage("http://chart.apis.google.com/"
@@ -99,12 +104,11 @@ function onMapLoad(){
     }
 
 
+    $('#option-list h2').click(function(){
 
-    //Need to optimise soon!
-
-    $('#option-list li').click(function(){
-      var index = parseInt($(this).attr('option-index'));
-
+      var index = parseInt($(this)
+        .closest('.ui-collapsible')
+        .attr('option-index'));
 
       var option_details = details[index]; //Replace with API get
 
