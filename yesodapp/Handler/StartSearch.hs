@@ -54,11 +54,11 @@ postStartSearchR = do
 
   -}
 
-  let newSearch = Searches
-                  { searchesPeople = []
-                  , searchesFilters = []
-                  , searchesChosen = Nothing
-                  , searchesPlaces = []
+  let newSearch = Search
+                  { searchPeople = []
+                  , searchFilters = []
+                  , searchChosen = Nothing
+                  , searchPlaces = []
                   }
   newSearchId <- runDB $ insert newSearch
 

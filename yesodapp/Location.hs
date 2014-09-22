@@ -16,7 +16,7 @@ data Location = Location
                 , lng :: Double
                 } deriving (Show, Read, Eq, Generic)
 
+derivePersistField "Location"
+
 instance ToJSON Location
 instance FromJSON Location
-
-derivePersistField "Location"

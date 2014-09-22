@@ -5,7 +5,7 @@ import Data.Aeson.Types
 import Data.Maybe (catMaybes)
 import qualified Data.Vector as V
 
-getPeopleR :: SearchesId -> Handler Value
+getPeopleR :: SearchId -> Handler Value
 getPeopleR searchId = do
   -- read up on http://hackage.haskell.org/package/persistent-1.3.3/docs/Database-Persist-Class.html
 
@@ -20,7 +20,7 @@ getPeopleR searchId = do
     Just searchEntry -> do
       -- Extract from people column of Searches table
       --     people :: [PeopleId]
-      let peopleIds = searchesPeople searchEntry
+      let peopleIds = searchPeople searchEntry
 
       -- Then get these entries from the People table,
       --  and output as JSON.

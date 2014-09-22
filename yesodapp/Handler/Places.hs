@@ -4,10 +4,10 @@ import Import
 import Data.Aeson.Types
 import Data.Vector as V
 
-getPlacesR :: SearchesId -> Handler Value
+getPlacesR :: SearchId -> Handler Value
 getPlacesR searchId = do
   -- Get the corresponding row from the Id
-  searchEntries <- runDB $ selectList [SearchesId ==. searchId] [LimitTo 1]
+  searchEntries <- runDB $ selectList [SearchId ==. searchId] [LimitTo 1]
 
   -- TODO: Extract from places column of Searches table
   --         places :: [PlaceId]

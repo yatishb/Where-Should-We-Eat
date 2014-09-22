@@ -19,5 +19,5 @@ share [mkPersist sqlOnlySettings, mkMigrate "migrateAll"]
 
 -- Instances for the models
 -- (Using GHC Generics)
-instance ToJSON People
-instance FromJSON People
+instance ToJSON Person
+instance FromJSON Person
