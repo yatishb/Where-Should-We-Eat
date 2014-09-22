@@ -53,13 +53,15 @@ postStartSearchR = do
   -- :: [Key Person] a.k.a [PersonId]
   -- selectKeysList is a bitch. :/
 
+
+  let nameAndPostalFilter p = [ PersonName   ==. (personName p)
+                              , PersonPostal ==. (personPostal p)]
+      phoneNumberFilter   p = [ PersonPhone  ==. (personPhone p)]
+      selectPersonFilterFor  p = (nameAndPostalFilter p) ||. (phoneNumberFilter p)
+
   peopleIds <- mapM
                (\p ->do
-                 maybePersonEntity <- runDB $
-                   selectFirst
-                   [ PersonName ==. (personName p)
-                   , PersonPostal ==. (personPostal p)]
-                   []
+                 maybePersonEntity <- runDB $ selectFirst (selectPersonFilterFor p) []
                  case maybePersonEntity of
                    Just personEntity ->
                     -- Person previously in DB
