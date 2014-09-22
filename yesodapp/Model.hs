@@ -6,6 +6,7 @@ import Yesod
 import Data.Text (Text)
 import Database.Persist.Quasi
 import Data.Typeable (Typeable)
+import Location
 import Prelude
 import GHC.Generics
 

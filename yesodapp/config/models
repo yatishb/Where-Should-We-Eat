@@ -12,14 +12,12 @@ People
     name String
     postal Int
     phone Int Maybe
-    lat String
-    lng String
+    location Location
     deriving Show
     deriving Generic
 Place
 	name String
-	lat String
-	lng String
+  location Location
 	yelpid String
 	imgurl String
 	deriving Show
