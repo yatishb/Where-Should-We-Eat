@@ -25,33 +25,17 @@ getPeopleR searchId = do
       -- Then get these entries from the People table,
       --  and output as JSON.
 
-      -- [PeopleId] to [Maybe PersistEntity People],
-      -- then [PersistEntity People] without the Nothing ones
-      -- (Get the PersistEntity People rather than People, so we can
-      --  use entityIdToJSON)
+      -- [PeopleId] to [Maybe People],
+      -- then [People] without the Nothing ones
       maybePeople <- mapM (\pId -> runDB $ get pId) peopleIds
       let people = catMaybes maybePeople
 
           -- There's surely a better way than this?
           -- e.g. GHC Generics? Though the record is from TH.
-          peopleValues = flip map people $ \person ->
-            object
-            [ "name"   .= peopleName person
-            , "postal" .= peoplePostal person
-            -- , "phone " .= ???
-            , "location" .= object
-                            [ "lat" .= peopleLat person
-                            , "lng" .= peopleLng person
-                            ]
-            ]
-
-      -- Can persistent automatically do JSON? I think so.
-      -- Kindof.
-      -- Database.Persist.listToJSON :: [PersistValue] -> Text,
-      -- Database.Persist.Class.entityIdToJSON :: ToJSON e => Entity e -> Value
-
-      -- People {name, postal :: Int, phone Int Maybe, lat, lng}
+          peopleValues = map toJSON people
 
       -- Return {people: [{name, postal, phone , location {lat, lng}}]}
+
+      -- Return {people: [{name, postal, phone , lat, lng}]}
       -- Aeson Arrays are Haskell vectors
       return $ object ["people" .= V.fromList peopleValues]
