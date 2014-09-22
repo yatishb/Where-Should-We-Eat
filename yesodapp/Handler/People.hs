@@ -14,8 +14,9 @@ getPeopleR searchId = do
 
   case maybeSearchEntry of
     Nothing -> return $
-      -- TODO: Return some kind of error?
-      object ["people" .= (V.empty :: Array)]
+      object [ "error"  .= ("No such search with id" :: Text)
+             , "people" .= (V.empty :: Array)
+             ]
 
     Just searchEntry -> do
       -- Extract from people column of Searches table
@@ -29,13 +30,8 @@ getPeopleR searchId = do
       -- then [People] without the Nothing ones
       maybePeople <- mapM (\pId -> runDB $ get pId) peopleIds
       let people = catMaybes maybePeople
-
-          -- There's surely a better way than this?
-          -- e.g. GHC Generics? Though the record is from TH.
           peopleValues = map toJSON people
 
       -- Return {people: [{name, postal, phone , location {lat, lng}}]}
-
-      -- Return {people: [{name, postal, phone , lat, lng}]}
       -- Aeson Arrays are Haskell vectors
       return $ object ["people" .= V.fromList peopleValues]

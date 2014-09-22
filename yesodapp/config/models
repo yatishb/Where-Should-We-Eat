@@ -21,6 +21,7 @@ Place
   	yelpid String
   	imgurl String
   	deriving Show
+    deriving Generic
 Search
     people [PersonId]
     filters [String]

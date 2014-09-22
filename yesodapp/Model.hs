@@ -21,3 +21,6 @@ share [mkPersist sqlOnlySettings, mkMigrate "migrateAll"]
 -- (Using GHC Generics)
 instance ToJSON Person
 instance FromJSON Person
+
+instance ToJSON Place
+instance FromJSON Place
