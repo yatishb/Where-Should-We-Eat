@@ -7,5 +7,5 @@
 / HomeR GET POST
 /geocode/#String GeoCodeR GET
 /doSearch StartSearchR POST
-/search/#SearchesId/people PeopleR GET
-/search/#SearchesId/places PlacesR GET
+/search/#SearchId/people PeopleR GET
+/search/#SearchId/places PlacesR GET
