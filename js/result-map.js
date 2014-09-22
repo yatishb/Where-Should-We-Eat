@@ -28,7 +28,16 @@ function init(){
       document.getElementById('map-canvas'),
       mapOptions
     );
-  onMapLoad();
+  $(document).on('pagecontainershow', function( event, ui){
+    var pageId = $('body').pagecontainer('getActivePage').prop('id');
+    if (pageId === 'NewConquestTwo'){
+      var center = map.getCenter();
+      google.maps.event.trigger(map, "resize");
+      map.setCenter(center);
+      onMapLoad();
+    } 
+  });
+
 }
 google.maps.event.addDomListener(window, 'load', init);
 
@@ -54,141 +63,138 @@ function onMapLoad(){
   var user_markers = [];
   var directionsMatrix = []
 
+  var direction_renderers = [];
 
-  $(document).ready(function(){
+  //Inside a get to the server to get details
 
-    var direction_renderers = [];
+  for(var i=0;i<details.length;i++){
+    $('#option-list').append(
+      '<div data-role="collapsible" data-collapsed-icon="carat-d"'
+      + ' data-expanded-icon="carat-u" data-iconpos="right" option-index=' + i + '>'
+      + '<h2><div style="float:left">'
+      + details[i].name + '</div><div style="float:right"> $'
+      + details[i].cost + '</div></h2>'
+      + details[i].info + '</div>'
+    );
+    directionsMatrix.push([]);
+  }
 
-    //Inside a get to the server to get details
-
-    for(var i=0;i<details.length;i++){
-      $('#option-list').append(
-        '<div data-role="collapsible" data-collapsed-icon="carat-d"'
-        + ' data-expanded-icon="carat-u" data-iconpos="right" option-index=' + i + '>'
-        + '<h2><div style="float:left">'
-        + details[i].name + '</div><div style="float:right"> $'
-        + details[i].cost + '</div></h2>'
-        + details[i].info + '</div>'
-      );
-      directionsMatrix.push([]);
-    }
-    $('#option-list').collapsibleset('refresh');
-
-    //Inside a get request to get lat+lng of users
-    var userPinImage = new google.maps.MarkerImage("http://chart.apis.google.com/"
-    + "chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + userPinColor,
-        new google.maps.Size(21, 34),
-        new google.maps.Point(0,0),
-        new google.maps.Point(10, 34));
-
-    for(var i=0;i<users.length;i++){
-      var latLng = new google.maps.LatLng(
-        users[i].lat, users[i].lng
-      )
-
-      user_markers.push(new google.maps.Marker({
-        position: latLng,
-        icon: userPinImage,
-        map: map
-      }));
-
-    }
+  $('#option-list').collapsibleset('refresh');
 
 
-    function generatePolyline(){
-      return new google.maps.Polyline({
-          strokeColor: polylineColors[polylineIndex++],
-          strokeOpacity: 0.7,
-          strokeWeight: 5
-      });
-    }
+  //Inside a get request to get lat+lng of users
+  var userPinImage = new google.maps.MarkerImage("http://chart.apis.google.com/"
+  + "chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + userPinColor,
+      new google.maps.Size(21, 34),
+      new google.maps.Point(0,0),
+      new google.maps.Point(10, 34));
+
+  for(var i=0;i<users.length;i++){
+    var latLng = new google.maps.LatLng(
+      users[i].lat, users[i].lng
+    )
+
+    user_markers.push(new google.maps.Marker({
+      position: latLng,
+      icon: userPinImage,
+      map: map
+    }));
+
+  }
 
 
-    $('#option-list h2').click(function(){
-
-      var index = parseInt($(this)
-        .closest('.ui-collapsible')
-        .attr('option-index'));
-
-      var option_details = details[index]; //Replace with API get
-
-      var myLatLng = new google.maps.LatLng(
-        option_details.lat,option_details.lng);
-
-      if(place_marker) {place_marker.setMap(null)};
-
-      place_marker = new google.maps.Marker({
-        position: myLatLng,
-        title: option_details.name,
-        animation: google.maps.Animation.DROP,
-      });
-
-      place_marker.setMap(map);
-
-      var bound = new google.maps.LatLngBounds();
-
-      for (var i=0; i<user_markers.length; i++){
-        bound.extend(user_markers[i].position);
-      }
-
-      bound.extend(place_marker.position);
-
-      map.setCenter(bound.getCenter());
-      map.fitBounds(bound);
-
-      polylineIndex = 0;
-      for(var i=0;i<direction_renderers.length;i++){
-        direction_renderers[i].setMap(null);
-      }
-      direction_renderers = [];
+function generatePolyline(){
+  return new google.maps.Polyline({
+      strokeColor: polylineColors[polylineIndex++],
+      strokeOpacity: 0.7,
+      strokeWeight: 5
+  });
+}
 
 
-      if(directionsMatrix[index].length === 0){
-        var i = 0;
+  $('#option-list h2').click(function(){
 
-        function syncLoop(){
+    var index = parseInt($(this)
+      .closest('.ui-collapsible')
+      .attr('option-index'));
 
-          setTimeout(function() {
-            var request = {
-              origin: place_marker.position,
-              destination: user_markers[i].position,
-              travelMode: google.maps.TravelMode.DRIVING
-            }
-            directionsService.route(request, function(response, status){
-              if (status === google.maps.DirectionsStatus.OK) {
-                var directionRenderer = new google.maps.DirectionsRenderer({
-                  suppressMarkers: true,
-                  polylineOptions: generatePolyline(),
-                  preserveViewport: true
-                });
-                directionRenderer.setDirections(response);
-                directionsMatrix[index].push(directionRenderer);
-                directionRenderer.setMap(map);
-                direction_renderers.push(directionRenderer);
+    var option_details = details[index]; //Replace with API get
 
-              } else {
-                //Over query limit error to be handled.
-              }
-            });
+    var myLatLng = new google.maps.LatLng(
+      option_details.lat,option_details.lng);
 
-            i++;
-            if(i<user_markers.length){
-              syncLoop();
-            }
+    if(place_marker) {place_marker.setMap(null)};
 
-          }, 200);
-        }
-
-        syncLoop();
-
-      } else {
-          for(var i=0; i<directionsMatrix[index].length; i++){
-            directionsMatrix[index][i].setMap(map);
-            direction_renderers.push(directionsMatrix[index][i]);
-          }
-      }
-
+    place_marker = new google.maps.Marker({
+      position: myLatLng,
+      title: option_details.name,
+      animation: google.maps.Animation.DROP,
     });
+
+    place_marker.setMap(map);
+
+    var bound = new google.maps.LatLngBounds();
+
+    for (var i=0; i<user_markers.length; i++){
+      bound.extend(user_markers[i].position);
+    }
+
+    bound.extend(place_marker.position);
+
+    map.setCenter(bound.getCenter());
+    map.fitBounds(bound);
+
+    polylineIndex = 0;
+    for(var i=0;i<direction_renderers.length;i++){
+      direction_renderers[i].setMap(null);
+    }
+    direction_renderers = [];
+
+
+    if(directionsMatrix[index].length === 0){
+      var i = 0;
+
+      function syncLoop(){
+
+        setTimeout(function() {
+          var request = {
+            origin: place_marker.position,
+            destination: user_markers[i].position,
+            travelMode: google.maps.TravelMode.DRIVING
+          }
+          directionsService.route(request, function(response, status){
+            if (status === google.maps.DirectionsStatus.OK) {
+              var directionRenderer = new google.maps.DirectionsRenderer({
+                suppressMarkers: true,
+                polylineOptions: generatePolyline(),
+                preserveViewport: true
+              });
+              directionRenderer.setDirections(response);
+              directionsMatrix[index].push(directionRenderer);
+              directionRenderer.setMap(map);
+              direction_renderers.push(directionRenderer);
+
+            } else {
+              //Over query limit error to be handled.
+            }
+          });
+
+          i++;
+          if(i<user_markers.length){
+            syncLoop();
+          }
+
+        }, 200); //Timeout to minimize likelihood of exceeding query limit
+      }
+
+      syncLoop();
+
+    } else {
+        for(var i=0; i<directionsMatrix[index].length; i++){
+          directionsMatrix[index][i].setMap(map);
+          direction_renderers.push(directionsMatrix[index][i]);
+        }
+    }
 
   });
 
