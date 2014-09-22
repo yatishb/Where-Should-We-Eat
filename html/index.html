@@ -10,7 +10,9 @@
     <link rel='stylesheet' href='http://code.jquery.com/mobile/1.4.3/jquery.mobile.structure-1.4.3.min.css' />
     <script src='http://code.jquery.com/jquery-1.11.1.min.js'></script>
     <script src='http://code.jquery.com/mobile/1.4.3/jquery.mobile-1.4.3.min.js'></script>
-
+    <script src='https://maps.googleapis.com/maps/api/js' +
+    '?key=AIzaSyBBsbcZWi9NmRSBp1ISIikmYbliZVHvcEA'></script>
+    <script src='../js/result-map.js'></script>
 	<script>
 		function conquestsEditOnclick() {
 			pointer = $('#conquestsEditButton');
@@ -255,9 +257,6 @@ hihihi
 </div>
 
 <div data-role="page" id="NewConquestTwo">
-  <script src='https://maps.googleapis.com/maps/api/js' +
-  '?key=AIzaSyBBsbcZWi9NmRSBp1ISIikmYbliZVHvcEA'></script>
-  <script src='../js/result-map.js'></script>
 	<div data-role="header">
 		<h1><center>Select Dungeon</center></h1>
 		<a href="#" class="ui-btn-left" data-icon="arrow-l" data-rel="back" data-iconpos="notext">Back</a>
@@ -265,6 +264,7 @@ hihihi
 	</div>
 
 	<div class='ui-body' id='map-body'>
+
     <div role='main' class='ui-content' id='map-canvas'>
     </div>
   </div>
