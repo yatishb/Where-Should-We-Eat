@@ -20,9 +20,9 @@ import qualified Location as Loc
 
 -- Will probably need to incorporate some monad return
 -- in order to utilize search.
-search :: [Loc.Location] -> [Place]
-search locations =
-  undefined
+searchWithLocations :: MonadIO m => [Loc.Location] -> m [Place]
+searchWithLocations locations =
+  return []
 
 -- Input, structured as:
 -- {people: [{name, postal, phone?, location {lat,lng}}]}
@@ -57,6 +57,17 @@ instance FromJSON Input
 instance ToJSON InputPerson
 instance FromJSON InputPerson
 
+ensureInDBandGetIdWith selectFilterFor p = do
+  maybeEntity <- runDB $ selectFirst (selectFilterFor p) []
+  case maybeEntity of
+    Just e ->
+      -- previously in DB
+      return $ entityKey e
+    Nothing ->
+      -- wasn't previously in DB
+      -- So, need to insert it.
+      runDB $ insert p
+
 postStartSearchR :: Handler Value
 postStartSearchR = do
   -- Get input
@@ -78,28 +89,30 @@ postStartSearchR = do
       selectPersonFilterFor  p = (nameAndPostalFilter p) ||. (phoneNumberFilter p)
 
   peopleIds <- mapM
-               (\p ->do
-                 maybePersonEntity <- runDB $ selectFirst (selectPersonFilterFor p) []
-                 case maybePersonEntity of
-                   Just personEntity ->
-                    -- Person previously in DB
-                    return $ entityKey personEntity
-                   Nothing ->
-                    -- Person wasn't previously in DB
-                    -- So, need to insert them.
-                    runDB $ insert p)
+               (ensureInDBandGetIdWith selectPersonFilterFor)
                inputPeople
+
+
+  foundPlaces <- searchWithLocations $ map personLocation inputPeople
+
+  -- Similar to peopleIds above, need to try finding entity in DB,
+  -- or insert if doesn't exist.
+  let selectPlaceFilterFor p = [PlaceYelpid ==. (placeYelpid p)]
+
+  placeIds <- mapM
+              (ensureInDBandGetIdWith selectPlaceFilterFor)
+              foundPlaces
+
+  -- TODO: TaxiFare (What type???)
+  -- TODO: Put into SearchPlace table.
 
   let newSearch = Search
                   { searchPeople = peopleIds
                   , searchFilters = []
                   , searchChosen = Nothing
-                  , searchPlaces = []
+                  , searchPlaces = placeIds
                   }
   newSearchId <- runDB $ insert newSearch
-
-  -- TODO: Average the locations
-  -- TODO: Use `Location -> [Place]`: 1) put Place in DB table(s), 2) PlaceIDs
 
   -- PersistInt64, which is a PersistValue
   let keyPersistValue = unKey newSearchId
