@@ -7,12 +7,11 @@
       <script>
       console.log("Testing /doSearch");
 
-      // Fuck, 'need' this Person prepend shit,
-      // due to the way Haskell's models generates the ADTs.
-      // ("need" is always relative, though.. but it's more concise
-      //  server-side this way)
-      var person1 = {"personName": "Richard", "personPostal": 618656, "personPhone": 1234, "personLocation": {"lat": 1.2, "lng": 3.4}};
-      var person2 = {"personName": "Yatish",  "personPostal": 117417, "personPhone": 5678, "personLocation": {"lat": 5.6, "lng": 7.8}};
+      // Fuck, API changed.
+      // "phone" is optional,
+      // "location" is ignored, computed serverside.
+      var person1 = {"name": "Richard", "postal": 618656};
+      var person2 = {"name": "Yatish",  "postal": 117417, "phone": 5678};
 
       $(document).ready(function(){
         $.post("http://localhost:3000/doSearch",
