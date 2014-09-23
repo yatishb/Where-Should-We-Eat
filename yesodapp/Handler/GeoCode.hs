@@ -8,10 +8,13 @@ import qualified Data.ByteString.Char8 as BC8
 
 import Data.Aeson
 import Data.Aeson.Types
+import Data.Attoparsec.Number
 import Data.Maybe (fromJust, Maybe)
 import Data.Vector ((!?))                 -- requires vector
 import qualified Data.Text as T
 import qualified Data.HashMap.Strict as M -- requires unordered-containers
+
+import qualified Location as Loc
 
 import Import
 
@@ -26,13 +29,32 @@ ix :: Value -> Int -> Maybe Value
 ix (Array arr) i = arr !? i
 ix _ _ = Nothing
 
+-- Not sure how dangerous this is,
+-- but pattern-match to coerce Value to (Number n)
+-- Converting to Text / read, just feels dirty,
+-- but I couldn't figure out Number -> Double.
+toDouble :: Value -> Double
+toDouble v@(Number val) = read valStr
+  where
+    valStr = BC8.unpack $ BS.pack $ L.unpack $ encode v
+
 getGoogleResult postCode = "http://maps.google.com/maps/api/geocode/json?address=" ++ postCode ++",+SG"
+
+geocode :: MonadIO m => String -> m Loc.Location
+geocode postalCode = do
+  bsResult <- simpleHttp (getGoogleResult postalCode)
+  let result =   fromJust $ decode bsResult
+      results  = fromJust $ result ^? "results"
+      geometry = fromJust $ (fromJust $ ix results 0) ^? "geometry"
+      location = fromJust $ geometry ^? "location"
+
+  return Loc.Location
+         { Loc.lat = toDouble (fromJust $ location ^? "lat")
+         , Loc.lng = toDouble (fromJust $ location ^? "lng")
+         }
+
 
 getGeoCodeR :: String -> Handler Value
 getGeoCodeR postalCode = do
-  bsResult <- simpleHttp (getGoogleResult postalCode)
-  let result =   fromJust $ decode bsResult
-  let results  = fromJust $ result ^? "results"
-  let geometry = fromJust $ (fromJust $ ix results 0) ^? "geometry"
-  let location = fromJust $ geometry ^? "location"
-  return location -- {"lat": .., "lng": ..}
+  location <- geocode postalCode
+  return $ toJSON location -- {"lat": .., "lng": ..}
