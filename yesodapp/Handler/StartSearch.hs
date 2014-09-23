@@ -15,26 +15,47 @@ import qualified Data.Text as T
 import qualified Data.Vector as V
 import GHC.Generics
 
+import Handler.GeoCode
+import qualified Location as Loc
+
+-- Will probably need to incorporate some monad return
+-- in order to utilize search.
+search :: [Loc.Location] -> [Place]
+search locations =
+  undefined
+
 -- Input, structured as:
 -- {people: [{name, postal, phone?, location {lat,lng}}]}
 -- unfortunate JSON name.
+
+-- Special structure for input,
+-- (Because it's annoying to demand personLocation input from
+--  initial POST, absurd to keep it as Maybe).
+data InputPerson = InputPerson
+                   { name :: String
+                   , postal :: Int
+                   , phone :: Maybe Int
+                   } deriving (Generic)
+
+-- Person isn't input with GeoLocation, so
+-- we compute
+personFromInput :: MonadIO m => InputPerson -> m Person
+personFromInput input = do
+  loc <- geocode $ show $ postal input
+  return Person { personName = name input
+                , personPostal = postal input
+                , personPhone = phone input
+                , personLocation = loc
+                }
+
 data Input = Input
-             { people :: [Person]
+             { people :: [InputPerson]
              } deriving (Generic)
 
 instance ToJSON Input
 instance FromJSON Input
-
--- From the fantastic http://dev.stephendiehl.com/hask/
--- Pull a key out of an JSON object.
-(^?) :: Value -> T.Text -> Maybe Value
-(^?) (Object obj) k = M.lookup k obj
-(^?) _ _ = Nothing
-
--- Pull the ith value out of a JSON list.
-ix :: Value -> Int -> Maybe Value
-ix (Array arr) i = arr !? i
-ix _ _ = Nothing
+instance ToJSON InputPerson
+instance FromJSON InputPerson
 
 postStartSearchR :: Handler Value
 postStartSearchR = do
@@ -43,16 +64,13 @@ postStartSearchR = do
   -- Until API is fixed, just use raw JSON Value.
   inputJSON <- requireJsonBody
 
-  -- "Dangerous" to use fromJust..
-  -- once API fixed, can move to generic fromJSON
-  let inputPeople = people inputJSON
+  inputPeople <- mapM personFromInput $ people inputJSON
 
   -- Get PeopleId for the corresponding input from Database
   -- where the row has a phonenumber,
   -- or the name + postal is the same.
   -- :: [Key Person] a.k.a [PersonId]
   -- selectKeysList is a bitch. :/
-
 
   let nameAndPostalFilter p = [ PersonName   ==. (personName p)
                               , PersonPostal ==. (personPostal p)]
@@ -80,7 +98,8 @@ postStartSearchR = do
                   }
   newSearchId <- runDB $ insert newSearch
 
-  -- TODO: Need to go away and update searchPlaces later.
+  -- TODO: Average the locations
+  -- TODO: Use `Location -> [Place]`: 1) put Place in DB table(s), 2) PlaceIDs
 
   -- PersistInt64, which is a PersistValue
   let keyPersistValue = unKey newSearchId
