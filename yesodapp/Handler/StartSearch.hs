@@ -1,66 +1,86 @@
+{-# LANGUAGE DeriveGeneric #-}
+
 module Handler.StartSearch where
 
 import Import
 
 import Data.Attoparsec.Number
+import Data.Aeson
+import Data.Aeson.Types (Result, Array)
+import Data.Vector ((!?))
+import Data.Maybe (fromJust, catMaybes)
 import Database.Persist.Types
+import qualified Data.HashMap.Strict as M
+import qualified Data.Text as T
+import qualified Data.Vector as V
+import GHC.Generics
 
-{-
+-- Input, structured as:
+-- {people: [{name, postal, phone?, location {lat,lng}}]}
+-- unfortunate JSON name.
+data Input = Input
+             { people :: [Person]
+             } deriving (Generic)
 
-Skeleton stuff,
-Insert a new post into DB.
+instance ToJSON Input
+instance FromJSON Input
 
-Input: Not yet settled;
-  * Might be JSON [PostalCode]
-  * Would prefer {people:[{postalcode:""}]}
+-- From the fantastic http://dev.stephendiehl.com/hask/
+-- Pull a key out of an JSON object.
+(^?) :: Value -> T.Text -> Maybe Value
+(^?) (Object obj) k = M.lookup k obj
+(^?) _ _ = Nothing
 
-Schema: (from config/models)
-    Searches
-      people [PeopleId]
-      filters [String]
-      chosen PlaceId
-      places [PlaceId]
-
-Output: JSON {searchId: int}
-
--}
+-- Pull the ith value out of a JSON list.
+ix :: Value -> Int -> Maybe Value
+ix (Array arr) i = arr !? i
+ix _ _ = Nothing
 
 postStartSearchR :: Handler Value
 postStartSearchR = do
   -- Get input
+  -- input in form: {people: [{...,postcode,...}]}
+  -- Until API is fixed, just use raw JSON Value.
+  inputJSON <- requireJsonBody
+
+  -- "Dangerous" to use fromJust..
+  -- once API fixed, can move to generic fromJSON
+  let inputPeople = people inputJSON
 
   -- Get PeopleId for the corresponding input from Database
-  {-
+  -- where the row has a phonenumber,
+  -- or the name + postal is the same.
+  -- :: [Key Person] a.k.a [PersonId]
+  -- selectKeysList is a bitch. :/
 
-  This involves being able to *uniquely* identify someone,
-  from input
-  based on either
-    Person's name + postal
-  or
-    Person's phone
 
-  Either loading from DB if this Person exists in DB,
-  or inserting this Person in DB if don't exist.
+  let nameAndPostalFilter p = [ PersonName   ==. (personName p)
+                              , PersonPostal ==. (personPostal p)]
+      phoneNumberFilter   p = [ PersonPhone  ==. (personPhone p)]
+      selectPersonFilterFor  p = (nameAndPostalFilter p) ||. (phoneNumberFilter p)
 
-  (Do we need Data Person, et al. ADT
-   for our App?? Does Persistent give us that?
-   YES! There should be a type People, Searches)
-  TODO: Tables should be named for individual nouns/types,
-        NOT plural/collective.
-
-  Since that's dependent on internal API,
-  (and some sample test case)
-  let's leave that for later.
-
-  -}
+  peopleIds <- mapM
+               (\p ->do
+                 maybePersonEntity <- runDB $ selectFirst (selectPersonFilterFor p) []
+                 case maybePersonEntity of
+                   Just personEntity ->
+                    -- Person previously in DB
+                    return $ entityKey personEntity
+                   Nothing ->
+                    -- Person wasn't previously in DB
+                    -- So, need to insert them.
+                    runDB $ insert p)
+               inputPeople
 
   let newSearch = Search
-                  { searchPeople = []
+                  { searchPeople = peopleIds
                   , searchFilters = []
                   , searchChosen = Nothing
                   , searchPlaces = []
                   }
   newSearchId <- runDB $ insert newSearch
+
+  -- TODO: Need to go away and update searchPlaces later.
 
   -- PersistInt64, which is a PersistValue
   let keyPersistValue = unKey newSearchId

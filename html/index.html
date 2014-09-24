@@ -1,5 +1,7 @@
+<!DOCTYPE html>
+
 <html>
-<head>
+ <head>
     <meta charset = 'utf-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <title>Le Skeleton Page</title>
@@ -15,6 +17,11 @@
     <script src='../js/result-map.js'></script>
     <script src='../js/party_selection.js'></script>
 	<script>
+		function clearLocalStorage() {
+			window.localStorage.clear();
+			location.reload();
+		}
+	
 		function conquestsEditOnclick() {
 			pointer = $('#conquestsEditButton');
 			if (pointer.text() == "Edit") {
@@ -37,16 +44,20 @@
 				$('#chosenParty').css('display','inline');
 			}
 		}
+		
+
 
 		// run
 		$(document).on('click', '.ui-input-clear', function () {
 			togglePartyView();
 		});
+		
+		//Skynet.init();
 
 
 
 	</script>
-  </head>
+ </head>
 
  <body>
 
@@ -86,6 +97,8 @@
 					</div>
 
 		<a href="#PageTwo" data-transition="SlideUp">GO PAGE TWO</a>
+		
+		<a href="#" class="ui-btn" onclick="clearLocalStorage()">Clear Local Storage</a>
 
 	</div>
 
@@ -97,7 +110,8 @@
 			<a href="#NewFriend" data-icon="plus" class="ui-btn-right" data-iconpos="notext" data-transition="slideUp"></a>
 		</div>
 
-		<ul data-role="listview" data-autodividers="true" data-filter="true" data-filter-placeholder="Search" data-inset="true">
+		<ul id="guildList" data-role="listview" data-autodividers="true" data-filter="true" data-filter-placeholder="Search" data-inset="true">
+			<!-- 
 			<li><a href="#">Adam Kinkaid</a></li>
 			<li><a href="#">Alex Wickerham</a></li>
 			<li><a href="#">Avery Johnson</a></li>
@@ -105,6 +119,7 @@
 			<li><a href="#">Caleb Booth</a></li>
 			<li><a href="#">Christopher Adams</a></li>
 			<li><a href="#">Culver James</a></li>
+			-->
 		</ul>
 
 
@@ -236,14 +251,16 @@ hihihi
 	<form class="ui-filterable">
 		<input id="requestParty" data-type="search" placeholder="Enter Postal Code or Name" oninput="togglePartyView()">
 	</form>
-	<ul data-role="listview" data-filter="true" data-filter-reveal="true" data-input="#requestParty" data-inset="true">
+	<ul id="partyRequestList" data-role="listview" data-filter="true" data-filter-reveal="true" data-input="#requestParty" data-inset="true">
 	 <!-- If you click on da links, it gets added. Links are from contact-book -->
+	 <!--
 		<li><a href="#" onclick="alert('This gets added to the list below')">Demon Hunter</a></li>
 		<li><a href="#">Monk</a></li>
 		<li><a href="#">Barbarian</a></li>
 		<li><a href="#">Crusader</a></li>
 		<li><a href="#">Necromancer</a></li>
 		<li><a href="#">Assassin</a></li>
+	-->	
 	</ul>
 
   <div data-role="fieldcontain" id="chosenParty">
@@ -312,20 +329,26 @@ hihihi
 
 <div data-role="page" id="NewFriend">
 
-	<div data-role="header">
-		<h3>New Friend</h3>
-		<a href="#" data-rel="back" data-icon="back" class="ui-btn-left">Cancel</a>
-		<a href="#" data-rel="back" data-icon="check" class="ui-btn-right">Done</a>
-	</div>
 
-	<form>
+	<form id="newGuildForm">
+
+		<div data-role="header">
+			<h3>New Friend</h3>
+			<a href="#PageOne" id="guildDiscardButton" data-icon="back" class="ui-btn-left">Cancel</a>
+			<a href="#PageOne" id="guildSaveButton" data-icon="check" class="ui-btn-right">Save</a>
+		</div>
+
 		<div style="padding:10px 20px;">
-			<label for="un" <!--class="ui-hidden-accessible"-->>Name:</label>
-			<input type="text" name="user" id="un" data-clear-btn="true" value="" placeholder="Name" data-theme="a">
-			<label for="pw" <!--class="ui-hidden-accessible"-->>Postal Code:</label>
-			<input type="tel" name="pass" id="pw" data-clear-btn="true" value="" placeholder="Postal Code" data-theme="a">
+			<label for="newGuildName" <!--class="ui-hidden-accessible"-->>Name:</label>
+			<input type="text" name="newGuildName" id="newGuildName" data-clear-btn="true" value="" placeholder="Name" data-theme="a">
+			<label for="newGuildPostal" <!--class="ui-hidden-accessible"-->>Postal Code:</label>
+			<input type="tel" name="newGuildPostal" id="newGuildPostal" data-clear-btn="true" value="" placeholder="Postal Code" data-theme="a">
+			<label for="newGuildMobile" <!--class="ui-hidden-accessible"-->>Mobile Number:</label>
+			<input type="tel" name="newGuildMobile" id="newGuildMobile" data-clear-btn="true" value="" placeholder="Mobile Number" data-theme="a">
 		</div>
 	</form>
+	
+	
 </div>
 
 
@@ -334,7 +357,162 @@ hihihi
 </body>
 
 <footer>
+	<script>
+	function checklocalstorage() {
+	for (i=0;i<window.localStorage.length;i++) {
+						key = window.localStorage.key(i);
+						if (/Skynet:g\d+/.test(key)) {
+							console.log(key);
+							console.log(window.localStorage.getItem(key));
+						}
+					}
+	}
+	
+		var Skynet = {
+			guildIndex: window.localStorage.getItem("Skynet:guildIndex"),
+			//conquestIndex: window.localStorage.getItem("Skynet:conquestIndex"),
+			$guildForm: document.getElementById('newGuildForm'),
+			$guildList: document.getElementById('guildList'),
+			//$conquestForm: $('#newConquestForm'),
+			//$conquestList: $('#conquestList'),
+			$button_saveGuild: document.getElementById('guildSaveButton'),
+			$button_discardGuild: document.getElementById('guildDiscardButton'),
+			
+			// moar shizz
 
+			init: function() {
+
+				// initialize storage or sync with database
+				if (!Skynet.guildIndex) {
+					window.localStorage.setItem("Skynet:guildIndex", Skynet.guildIndex = 1);
+				}
+				/*if (!Skynet.conquestIndex) {
+					window.localStorage.setItem("Skynet:conquestIndex", Skynet.conquestIndex = 1);
+				}*/
+				
+				// initialize forms
+				Skynet.$guildForm.reset();
+				Skynet.$button_discardGuild.addEventListener("click", function(event) {
+					Skynet.$guildForm.reset();
+					
+					checklocalstorage();
+				}, true);
+				
+				Skynet.$button_saveGuild.addEventListener("click", function(event) {
+					var entry = {
+						guildId: parseInt(Skynet.guildIndex),
+						guildName: Skynet.$guildForm.newGuildName.value,
+						guildPostal: Skynet.$guildForm.newGuildPostal.value,
+						guildMobile: Skynet.$guildForm.newGuildMobile.value
+					};
+	
+					Skynet.guildAdd(entry);
+					Skynet.guildShow(entry);
+					
+					$('#guildList').listview('refresh');
+					Skynet.$guildForm.reset();
+				}, true);
+				
+				// initialize display
+				if (window.localStorage.length - 1) {
+					var guildRoster = []/*, i, key*/;
+					for (i=0;i<window.localStorage.length;i++) {
+						key = window.localStorage.key(i);
+						if (/Skynet:g\d+/.test(key)) {
+							guildRoster.push(JSON.parse(window.localStorage.getItem(key)));
+						}
+					}
+					
+					console.log(guildRoster);
+					
+					if (guildRoster.length) {
+						for (i=0;i<guildRoster.length;i++) {
+							console.log(guildRoster[i]);
+							Skynet.guildShow(guildRoster[i]);
+							
+						}
+					}
+				}
+				
+				
+			},			
+
+			
+			// governing local storage
+			guildAdd: function(entry) {
+				window.localStorage.setItem("Skynet:guildIndex", ++Skynet.guildIndex);
+				window.localStorage.setItem("Skynet:g"+entry.guildId, JSON.stringify(entry));
+			},
+			
+			guildEdit: function(entry) {
+				window.localStorage.setItem("Skynet:g"+ entry.guildId, JSON.stringify(entry));
+			},
+			
+			guildRemove: function(entry) {
+				window.localStorage.removeItem("Skynet:g"+ entry.guildId);
+			},
+			/*
+			conquestAdd: function(entry) {
+			
+			},
+			
+			conquestEdit: function(entry) {
+			
+			},
+			
+			conquestRemove: function(entry) {
+			
+			},
+			*/
+			
+			// governing representation/output
+			
+			guildShow: function(entry) {
+				$li = $("<li />").attr('id', 'guildNumber-' + entry.guildId);
+				$a = $("<a />")
+					.attr('href', '#')
+					.text(entry.guildName);
+				$li.append($a);
+				//Skynet.$guildList.appendChild($li.get(0));
+				var added = false;
+				$('#guildList').children().each(function(i) {
+					if(entry.guildName < $(this).text()) {
+						$li.insertBefore($(this));
+						added = true;
+						return false;
+					}
+				});
+				if (!added) {
+					$('#guildList').append($li);
+				}
+			},
+			
+			guildModify: function(entry) {
+				
+			},
+			
+			guildHide: function(entry) {
+				$("#guildNumber-" + entry.guildId).remove();
+			},
+			/*
+			conquestShow: function(entry) {
+			
+			},
+			
+			conquestModify: function(entry) {
+			
+			},
+			
+			conquestHide: function(entry) {
+			
+			}
+			*/
+		};
+
+
+		$(Skynet.init());
+
+	</script>
 </footer>
 
 </html>
