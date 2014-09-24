@@ -21,12 +21,11 @@ $(document).ready(function(){
         }
       });
       var payload = JSON.stringify({'people':toSearch});
-      console.log(payload);
       $.post('/doSearch',
-      payload,
-      function(res){
-        updateSearchResults(res.searchId);
-      });
+       payload,
+       function(res){
+         query.updateSearchResults(res.searchId);
+       });
     };
   });
 

@@ -14,6 +14,7 @@
     <script src='http://code.jquery.com/mobile/1.4.3/jquery.mobile-1.4.3.min.js'></script>
     <script src='https://maps.googleapis.com/maps/api/js' +
     '?key=AIzaSyBBsbcZWi9NmRSBp1ISIikmYbliZVHvcEA'></script>
+    <script src='../js/query_engine.js'></script>
     <script src='../js/result-map.js'></script>
     <script src='../js/party_selection.js'></script>
 	<script>
@@ -21,7 +22,7 @@
 			window.localStorage.clear();
 			location.reload();
 		}
-	
+
 		function conquestsEditOnclick() {
 			pointer = $('#conquestsEditButton');
 			if (pointer.text() == "Edit") {
@@ -44,14 +45,14 @@
 				$('#chosenParty').css('display','inline');
 			}
 		}
-		
+
 
 
 		// run
 		$(document).on('click', '.ui-input-clear', function () {
 			togglePartyView();
 		});
-		
+
 		//Skynet.init();
 
 
@@ -97,7 +98,7 @@
 					</div>
 
 		<a href="#PageTwo" data-transition="SlideUp">GO PAGE TWO</a>
-		
+
 		<a href="#" class="ui-btn" onclick="clearLocalStorage()">Clear Local Storage</a>
 
 	</div>
@@ -111,7 +112,7 @@
 		</div>
 
 		<ul id="guildList" data-role="listview" data-autodividers="true" data-filter="true" data-filter-placeholder="Search" data-inset="true">
-			<!-- 
+			<!--
 			<li><a href="#">Adam Kinkaid</a></li>
 			<li><a href="#">Alex Wickerham</a></li>
 			<li><a href="#">Avery Johnson</a></li>
@@ -260,7 +261,7 @@ hihihi
 		<li><a href="#">Crusader</a></li>
 		<li><a href="#">Necromancer</a></li>
 		<li><a href="#">Assassin</a></li>
-	-->	
+	-->
 	</ul>
 
   <div data-role="fieldcontain" id="chosenParty">
@@ -285,7 +286,7 @@ hihihi
   </div>
 
 	Suggestions:
-	<div data-role="collapsibleset" data-inset="true" id="option-list">
+	<div data-role="collapsibleset" data-inset="true" id="place-option-list">
 
 	</div>
 
@@ -347,8 +348,8 @@ hihihi
 			<input type="tel" name="newGuildMobile" id="newGuildMobile" data-clear-btn="true" value="" placeholder="Mobile Number" data-theme="a">
 		</div>
 	</form>
-	
-	
+
+
 </div>
 
 
@@ -367,7 +368,7 @@ hihihi
 						}
 					}
 	}
-	
+
 		var Skynet = {
 			guildIndex: window.localStorage.getItem("Skynet:guildIndex"),
 			//conquestIndex: window.localStorage.getItem("Skynet:conquestIndex"),
@@ -377,7 +378,7 @@ hihihi
 			//$conquestList: $('#conquestList'),
 			$button_saveGuild: document.getElementById('guildSaveButton'),
 			$button_discardGuild: document.getElementById('guildDiscardButton'),
-			
+
 			// moar shizz
 
 			init: function() {
@@ -389,15 +390,15 @@ hihihi
 				/*if (!Skynet.conquestIndex) {
 					window.localStorage.setItem("Skynet:conquestIndex", Skynet.conquestIndex = 1);
 				}*/
-				
+
 				// initialize forms
 				Skynet.$guildForm.reset();
 				Skynet.$button_discardGuild.addEventListener("click", function(event) {
 					Skynet.$guildForm.reset();
-					
+
 					checklocalstorage();
 				}, true);
-				
+
 				Skynet.$button_saveGuild.addEventListener("click", function(event) {
 					var entry = {
 						guildId: parseInt(Skynet.guildIndex),
@@ -405,14 +406,14 @@ hihihi
 						guildPostal: Skynet.$guildForm.newGuildPostal.value,
 						guildMobile: Skynet.$guildForm.newGuildMobile.value
 					};
-	
+
 					Skynet.guildAdd(entry);
 					Skynet.guildShow(entry);
-					
+
 					$('#guildList').listview('refresh');
 					Skynet.$guildForm.reset();
 				}, true);
-				
+
 				// initialize display
 				if (window.localStorage.length - 1) {
 					var guildRoster = []/*, i, key*/;
@@ -422,51 +423,51 @@ hihihi
 							guildRoster.push(JSON.parse(window.localStorage.getItem(key)));
 						}
 					}
-					
+
 					console.log(guildRoster);
-					
+
 					if (guildRoster.length) {
 						for (i=0;i<guildRoster.length;i++) {
 							console.log(guildRoster[i]);
 							Skynet.guildShow(guildRoster[i]);
-							
+
 						}
 					}
 				}
-				
-				
-			},			
 
-			
+
+			},
+
+
 			// governing local storage
 			guildAdd: function(entry) {
 				window.localStorage.setItem("Skynet:guildIndex", ++Skynet.guildIndex);
 				window.localStorage.setItem("Skynet:g"+entry.guildId, JSON.stringify(entry));
 			},
-			
+
 			guildEdit: function(entry) {
 				window.localStorage.setItem("Skynet:g"+ entry.guildId, JSON.stringify(entry));
 			},
-			
+
 			guildRemove: function(entry) {
 				window.localStorage.removeItem("Skynet:g"+ entry.guildId);
 			},
 			/*
 			conquestAdd: function(entry) {
-			
+
 			},
-			
+
 			conquestEdit: function(entry) {
-			
+
 			},
-			
+
 			conquestRemove: function(entry) {
-			
+
 			},
 			*/
-			
+
 			// governing representation/output
-			
+
 			guildShow: function(entry) {
 				$li = $("<li />").attr('id', 'guildNumber-' + entry.guildId);
 				$a = $("<a />")
@@ -486,25 +487,25 @@ hihihi
 					$('#guildList').append($li);
 				}
 			},
-			
+
 			guildModify: function(entry) {
-				
+
 			},
-			
+
 			guildHide: function(entry) {
 				$("#guildNumber-" + entry.guildId).remove();
 			},
 			/*
 			conquestShow: function(entry) {
-			
+
 			},
-			
+
 			conquestModify: function(entry) {
-			
+
 			},
-			
+
 			conquestHide: function(entry) {
-			
+
 			}
 			*/
 		};
