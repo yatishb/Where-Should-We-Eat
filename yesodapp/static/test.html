@@ -1,46 +1,81 @@
 <html>
   <head>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-
+    <link rel="stylesheet" href="//code.jquery.com/qunit/qunit-1.15.0.css">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
   </head>
   <body>
-      <script>
-      console.log("Testing /doSearch");
+    <div id="qunit"></div>
+    <div id="qunit-fixture"></div>
 
+    <script src="//code.jquery.com/qunit/qunit-1.15.0.js"></script>
+
+    <script>
       // Fuck, API changed.
       // "phone" is optional,
       // "location" is ignored, computed serverside.
       var person1 = {"name": "Richard", "postal": 618656};
       var person2 = {"name": "Yatish",  "postal": 117417, "phone": 5678};
 
-      $(document).ready(function(){
-        $.post("http://localhost:3000/doSearch",
+      QUnit.asyncTest("/doSearch with some input", function( assert ) {
+        expect( 2 ); // number of assertions in this async test.
+
+        $.post("../doSearch",
                JSON.stringify({
                  "people": [person1, person2]
                }),
                gotBackFromDoSearch);
+
+        function gotBackFromDoSearch(response) {
+          console.log("** /doSearch callback **");
+          console.log("RES:" + response);
+          console.log(JSON.stringify(response));
+
+          var searchId = response.searchId;
+
+          $.get("../search/" + searchId + "/people",
+                "",
+                gotBackFromGetSearchPeople);
+        }
+
+        function gotBackFromGetSearchPeople(response) {
+          console.log("** /search/#SearchId/people callback **");
+          console.log("RES:" + response);
+          console.log(JSON.stringify(response));
+
+          assert.ok( !response.error, "response contains no error, search with given id exists" );
+          assert.equal( response.people.length, 2, "both people correctly input to search" );
+
+          QUnit.start();
+        }
       });
 
-      function gotBackFromDoSearch(response) {
-        console.log("** /doSearch callback **");
-        console.log("RES:" + response);
-        console.log(JSON.stringify(response));
+      QUnit.asyncTest("/geocode for 117417", function( assert ) {
+        expect( 2 ); // number of assertions in this async test.
 
-        // {searchId:}
-        var searchId = response.searchId;
+        // Check to 3 or 4 decimal places, should be okay.
 
-        $.get("http://localhost:3000/search/" + searchId + "/people",
+        $.get("../geocode/117417",
               "",
-              gotBackFromGetSearchPeople);
-      }
+              gotBackFromGeocode);
 
-      function gotBackFromGetSearchPeople(response) {
-        console.log("** /search/#SearchId/people callback **");
-        console.log("RES:" + response);
-        console.log(JSON.stringify(response));
+        // TODO(?): for get ../geocode postcode=117417
+        // * (Nginx) rewrite rules..
 
-        // {people:[]}
-      }
-      </script>
+        function gotBackFromGeocode(response) {
+          var lng = response.lng;
+          var lat = response.lat;
+
+          var expectedLng = 103.773846;
+          var expectedLat =   1.295053;
+
+          var acceptableError = 0.001;
+
+          assert.ok( Math.abs( expectedLat - lat) < acceptableError, "lat okay" );
+          assert.ok( Math.abs( expectedLng - lng) < acceptableError, "lng okay" );
+
+          QUnit.start();
+        }
+      });
+    </script>
   </body>
 </html>
