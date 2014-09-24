@@ -11,6 +11,7 @@ import Network.OAuth.Http.Response
 import Network.OAuth.Http.HttpClient
 import Network.OAuth.Http.CurlHttpClient
 import Network.Curl
+import Network.HTTP.Base
 import qualified Data.ByteString.Lazy as L
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Char8 as BC8
@@ -95,11 +96,10 @@ extractplace placeObject = do
     Arguments : Object of the business
     Returns : return the business as a place
     -}
-    let name = toString ( fromJust $ placeObject ^? "name" )
-        yelpid = toString ( fromJust $ placeObject ^? "id" )
+    let name = toString ( fromMaybe (error "no name found") $ placeObject ^? "name" )
+        yelpid = toString ( fromMaybe (error "no yelpid found") $ placeObject ^? "id" )
         imgurl = toString ( fromMaybe "noimage" $ placeObject ^? "image_url" )
-        address = concatenate (fromJust $ (fromJust $ placeObject ^? "location") ^? "address" )
-        -- loc = Location 0 0
+        address = urlEncode( concatenate (fromMaybe (error "no address found") $ (fromMaybe (error "no location found") $ placeObject ^? "location") ^? "address" ) )
     loc <- G.geocode address
     let place = Place name loc yelpid imgurl
 
@@ -118,8 +118,8 @@ search location = do
     -- Search yelp with required parameters
     response <- yelpRequest searchpath searchparam
     -- Decode the received result and create list of Places
-    let decoded = fromJust $ decode response
-    let businesses = fromJust $ decoded ^? "businesses"
+    let decoded = fromMaybe (error "no response found") $ decode response
+    let businesses = fromMaybe (error "no businesses found") $ decoded ^? "businesses"
     -- Create [Place] from the businesses with only the necessary info
     places <- case businesses of
                     (Array busVec) -> mapM extractplace $ V.toList busVec
