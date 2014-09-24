@@ -33,7 +33,7 @@ searchWithLocations locations =
 --  initial POST, absurd to keep it as Maybe).
 data InputPerson = InputPerson
                    { name :: String
-                   , postal :: Int
+                   , postal :: String
                    , phone :: Maybe Int
                    } deriving (Generic)
 
