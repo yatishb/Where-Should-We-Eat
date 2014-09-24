@@ -16,7 +16,7 @@
       var person1 = {"name": "Richard", "postal": "618656"};
       var person2 = {"name": "Yatish",  "postal": "117417", "phone": 5678};
 
-      QUnit.asyncTest("/doSearch with some input", function( assert ) {
+      QUnit.asyncTest("/doSearch and check /people", function( assert ) {
         expect( 2 ); // number of assertions in this async test.
 
         $.post("../doSearch",
@@ -44,6 +44,38 @@
 
           assert.ok( !response.error, "response contains no error, search with given id exists" );
           assert.equal( response.people.length, 2, "both people correctly input to search" );
+
+          QUnit.start();
+        }
+      });
+
+      QUnit.asyncTest("/doSearch and check /places", function( assert ) {
+        expect( 1 ); // number of assertions in this async test.
+
+        $.post("../doSearch",
+               JSON.stringify({
+                 "people": [person1, person2]
+               }),
+               gotBackFromDoSearch);
+
+        function gotBackFromDoSearch(response) {
+          console.log("** /doSearch callback **");
+          console.log("RES:" + response);
+          console.log(JSON.stringify(response));
+
+          var searchId = response.searchId;
+
+          $.get("../search/" + searchId + "/places",
+                "",
+                gotBackFromGetSearchPlaces);
+        }
+
+        function gotBackFromGetSearchPlaces(response) {
+          console.log("** /search/#SearchId/places callback **");
+          console.log("RES:" + response);
+          console.log(JSON.stringify(response));
+
+          assert.ok( !response.error, "response contains no error, search with given id exists" );
 
           QUnit.start();
         }
