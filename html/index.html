@@ -13,6 +13,7 @@
     <script src='https://maps.googleapis.com/maps/api/js' +
     '?key=AIzaSyBBsbcZWi9NmRSBp1ISIikmYbliZVHvcEA'></script>
     <script src='../js/result-map.js'></script>
+    <script src='../js/party_selection.js'></script>
 	<script>
 		function conquestsEditOnclick() {
 			pointer = $('#conquestsEditButton');
@@ -245,13 +246,10 @@ hihihi
 		<li><a href="#">Assassin</a></li>
 	</ul>
 
-	<ul data-role="listview" id="chosenParty" style="display:inline">
-	<!-- Need to implement swipe-to-delete functionality for chosen party -->
-		<li>Warrior</li>
-		<li>Wizard</li>
-		<li>Cleric</li>
-		<li>Ranger</li>
-	</ul>
+  <div data-role="fieldcontain" id="chosenParty">
+    <fieldset data-role="controlgroup">
+    </fieldset>
+  </div>
 
 
 </div>

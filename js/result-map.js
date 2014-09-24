@@ -41,7 +41,6 @@ function init(){
 }
 google.maps.event.addDomListener(window, 'load', init);
 
-
 var details = [
 {'name':'Burger Shack', 'lat':1.308, 'lng':103.82, 'cost':250, 'info':'Placeholder 1'},
 {'name':'Salad Bar', 'lat':1.305, 'lng':103.79, 'cost':200, 'info':'Placeholder 2'},
@@ -50,12 +49,34 @@ var details = [
 {'name':'Expensive Restaurant', 'lat':1.3, 'lng':103.78,'cost':280, 'info':'Placeholder 5'}
 ];
 
-var users = [
-  {'lat':1.3055, 'lng':103.80},
-  {'lat':1.3085, 'lng':103.77},
-  {'lat':1.3065, 'lng':103.79},
-  {'lat':1.3075, 'lng':103.78}
-]
+function updateSearchResults(searchId){
+  //TODO
+  console.log(searchId);
+  $.get('/search/' + searchId + '/people',
+  function(res){
+    console.log('Response');
+    console.log(res);
+    var userPinImage = new google.maps.MarkerImage("http://chart.apis.google.com/"
+    + "chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + userPinColor,
+        new google.maps.Size(21, 34),
+        new google.maps.Point(0,0),
+        new google.maps.Point(10, 34));
+
+    user_markers = res.people.map(function(val){
+      return new google.maps.Marker({
+        position: new google.maps.LatLng(
+          val.personLocation.lat,
+          val.personLocation.lng
+        ),
+        icon: userPinImage,
+        map: map
+      })
+    })
+
+  });
+
+  //Add get for places here
+}
 
 
 function onMapLoad(){
@@ -80,27 +101,6 @@ function onMapLoad(){
   }
 
   $('#option-list').collapsibleset('refresh');
-
-
-  //Inside a get request to get lat+lng of users
-  var userPinImage = new google.maps.MarkerImage("http://chart.apis.google.com/"
-  + "chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + userPinColor,
-      new google.maps.Size(21, 34),
-      new google.maps.Point(0,0),
-      new google.maps.Point(10, 34));
-
-  for(var i=0;i<users.length;i++){
-    var latLng = new google.maps.LatLng(
-      users[i].lat, users[i].lng
-    )
-
-    user_markers.push(new google.maps.Marker({
-      position: latLng,
-      icon: userPinImage,
-      map: map
-    }));
-
-  }
 
 
 function generatePolyline(){
