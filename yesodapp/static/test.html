@@ -13,8 +13,8 @@
       // Fuck, API changed.
       // "phone" is optional,
       // "location" is ignored, computed serverside.
-      var person1 = {"name": "Richard", "postal": 618656};
-      var person2 = {"name": "Yatish",  "postal": 117417, "phone": 5678};
+      var person1 = {"name": "Richard", "postal": "618656"};
+      var person2 = {"name": "Yatish",  "postal": "117417", "phone": 5678};
 
       QUnit.asyncTest("/doSearch with some input", function( assert ) {
         expect( 2 ); // number of assertions in this async test.
@@ -49,32 +49,38 @@
         }
       });
 
-      QUnit.asyncTest("/geocode for 117417", function( assert ) {
-        expect( 2 ); // number of assertions in this async test.
+      var testGeocode = [{"postcode": "117417", "expected": {"lat": 1.295053, "lng": 103.773846}},
+                         {"postcode": "088278", "expected": {"lat": 1.274452, "lng": 103.841691}},
+                         {"postcode": "138595", "expected": {"lat": 1.306481, "lng": 103.773701}}];
+      testGeocode.forEach(function(geocodeInput) {
+        var inputPostcode = geocodeInput.postcode;
+        QUnit.asyncTest("/geocode for " + inputPostcode, function( assert ) {
+          expect( 2 ); // number of assertions in this async test.
 
-        // Check to 3 or 4 decimal places, should be okay.
+          // Check to 3 or 4 decimal places, should be okay.
 
-        $.get("../geocode/117417",
-              "",
-              gotBackFromGeocode);
+          $.get("../geocode/" + inputPostcode,
+                "",
+                gotBackFromGeocode);
 
-        // TODO(?): for get ../geocode postcode=117417
-        // * (Nginx) rewrite rules..
+          // TODO(?): for get ../geocode postcode=117417
+          // * (Nginx) rewrite rules..
 
-        function gotBackFromGeocode(response) {
-          var lng = response.lng;
-          var lat = response.lat;
+          function gotBackFromGeocode(response) {
+            var lat = response.lat;
+            var lng = response.lng;
 
-          var expectedLng = 103.773846;
-          var expectedLat =   1.295053;
+            var expectedLat = geocodeInput.expected.lat;
+            var expectedLng = geocodeInput.expected.lng;
 
-          var acceptableError = 0.001;
+            var acceptableError = 0.001;
 
-          assert.ok( Math.abs( expectedLat - lat) < acceptableError, "lat okay" );
-          assert.ok( Math.abs( expectedLng - lng) < acceptableError, "lng okay" );
+            assert.ok( Math.abs( expectedLat - lat) < acceptableError, "lat okay" );
+            assert.ok( Math.abs( expectedLng - lng) < acceptableError, "lng okay" );
 
-          QUnit.start();
-        }
+            QUnit.start();
+          }
+        });
       });
     </script>
   </body>
