@@ -99,6 +99,7 @@ extractplace placeObject = do
         yelpid = toString ( fromJust $ placeObject ^? "id" )
         imgurl = toString ( fromMaybe "noimage" $ placeObject ^? "image_url" )
         address = concatenate (fromJust $ (fromJust $ placeObject ^? "location") ^? "address" )
+        -- loc = Location 0 0
     loc <- G.geocode address
     let place = Place name loc yelpid imgurl
 
@@ -113,7 +114,7 @@ search location = do
     -}
     let clat = show $ lat location
         clng = show $ lng location
-    let searchparam = "term=food&ll=" ++ clat ++ "%2C" ++ clng ++ "&sort=1"
+    let searchparam = "term=food&ll=" ++ clat ++ "%2C" ++ clng ++ "&sort=1&limit=10"
     -- Search yelp with required parameters
     response <- yelpRequest searchpath searchparam
     -- Decode the received result and create list of Places

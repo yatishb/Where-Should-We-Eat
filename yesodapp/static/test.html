@@ -16,71 +16,6 @@
       var person1 = {"name": "Richard", "postal": "618656"};
       var person2 = {"name": "Yatish",  "postal": "117417", "phone": 5678};
 
-      QUnit.asyncTest("/doSearch and check /people", function( assert ) {
-        expect( 2 ); // number of assertions in this async test.
-
-        $.post("../doSearch",
-               JSON.stringify({
-                 "people": [person1, person2]
-               }),
-               gotBackFromDoSearch);
-
-        function gotBackFromDoSearch(response) {
-          console.log("** /doSearch callback **");
-          console.log("RES:" + response);
-          console.log(JSON.stringify(response));
-
-          var searchId = response.searchId;
-
-          $.get("../search/" + searchId + "/people",
-                "",
-                gotBackFromGetSearchPeople);
-        }
-
-        function gotBackFromGetSearchPeople(response) {
-          console.log("** /search/#SearchId/people callback **");
-          console.log("RES:" + response);
-          console.log(JSON.stringify(response));
-
-          assert.ok( !response.error, "response contains no error, search with given id exists" );
-          assert.equal( response.people.length, 2, "both people correctly input to search" );
-
-          QUnit.start();
-        }
-      });
-
-      QUnit.asyncTest("/doSearch and check /places", function( assert ) {
-        expect( 1 ); // number of assertions in this async test.
-
-        $.post("../doSearch",
-               JSON.stringify({
-                 "people": [person1, person2]
-               }),
-               gotBackFromDoSearch);
-
-        function gotBackFromDoSearch(response) {
-          console.log("** /doSearch callback **");
-          console.log("RES:" + response);
-          console.log(JSON.stringify(response));
-
-          var searchId = response.searchId;
-
-          $.get("../search/" + searchId + "/places",
-                "",
-                gotBackFromGetSearchPlaces);
-        }
-
-        function gotBackFromGetSearchPlaces(response) {
-          console.log("** /search/#SearchId/places callback **");
-          console.log("RES:" + response);
-          console.log(JSON.stringify(response));
-
-          assert.ok( !response.error, "response contains no error, search with given id exists" );
-
-          QUnit.start();
-        }
-      });
-
       var testGeocode = [{"postcode": "117417", "expected": {"lat": 1.295053, "lng": 103.773846}},
                          {"postcode": "088278", "expected": {"lat": 1.274452, "lng": 103.841691}},
                          {"postcode": "138595", "expected": {"lat": 1.306481, "lng": 103.773701}}];
@@ -114,6 +49,106 @@
           }
         });
       });
+
+
+      QUnit.asyncTest("/geocode for Line 31", function( assert ) {
+        expect( 2 ); // number of assertions in this async test.
+
+        // Check to 3 or 4 decimal places, should be okay.
+
+        var inputAddress = "448 Clementi Ave 3#01-50";
+
+        $.get("../geocode/" + inputAddress,
+              "",
+              gotBackFromGeocode);
+
+        // TODO(?): for get ../geocode postcode=117417
+        // * (Nginx) rewrite rules..
+
+        function gotBackFromGeocode(response) {
+          var lat = response.lat;
+          var lng = response.lng;
+
+          var expectedLat = 1.313;
+          var expectedLng = 103.764;
+
+          var acceptableError = 0.001;
+
+          assert.ok( Math.abs( expectedLat - lat) < acceptableError, "lat okay" );
+          assert.ok( Math.abs( expectedLng - lng) < acceptableError, "lng okay" );
+
+          QUnit.start();
+        }
+      });
+
+
+    QUnit.asyncTest("/doSearch and check /people", function( assert ) {
+      expect( 2 ); // number of assertions in this async test.
+
+      $.post("../doSearch",
+             JSON.stringify({
+               "people": [person1, person2]
+             }),
+             gotBackFromDoSearch);
+
+      function gotBackFromDoSearch(response) {
+        console.log("** /doSearch callback **");
+        console.log("RES:" + response);
+        console.log(JSON.stringify(response));
+
+        var searchId = response.searchId;
+
+        $.get("../search/" + searchId + "/people",
+              "",
+              gotBackFromGetSearchPeople);
+      }
+
+      function gotBackFromGetSearchPeople(response) {
+        console.log("** /search/#SearchId/people callback **");
+        console.log("RES:" + response);
+        console.log(JSON.stringify(response));
+
+        assert.ok( !response.error, "response contains no error, search with given id exists" );
+        assert.equal( response.people.length, 2, "both people correctly input to search" );
+
+        QUnit.start();
+      }
+    });
+
+    // QUnit.asyncTest("/doSearch and check /places", function( assert ) {
+    //   expect( 1 ); // number of assertions in this async test.
+    //
+    //   $.post("../doSearch",
+    //          JSON.stringify({
+    //            "people": [person1, person2]
+    //          }),
+    //          gotBackFromDoSearch);
+    //
+    //   function gotBackFromDoSearch(response) {
+    //     console.log("** /doSearch callback **");
+    //     console.log("RES:" + response);
+    //     console.log(JSON.stringify(response));
+    //
+    //     var searchId = response.searchId;
+    //
+    //     $.get("../search/" + searchId + "/places",
+    //           "",
+    //           gotBackFromGetSearchPlaces);
+    //   }
+    //
+    //   function gotBackFromGetSearchPlaces(response) {
+    //     console.log("** /search/#SearchId/places callback **");
+    //     console.log("RES:" + response);
+    //     console.log(JSON.stringify(response));
+    //
+    //     assert.ok( !response.error, "response contains no error, search with given id exists" );
+    //
+    //     QUnit.start();
+    //   }
+    // });
+
+
+
     </script>
   </body>
 </html>
