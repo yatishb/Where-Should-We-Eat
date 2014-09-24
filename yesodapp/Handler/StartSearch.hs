@@ -17,12 +17,14 @@ import GHC.Generics
 
 import Handler.GeoCode
 import qualified Location as Loc
+import Yelp
 
 -- Will probably need to incorporate some monad return
 -- in order to utilize search.
 searchWithLocations :: MonadIO m => [Loc.Location] -> m [Place]
-searchWithLocations locations =
-  return []
+searchWithLocations locations = 
+  search $ Loc.averageLocation locations
+  --return []
 
 -- Input, structured as:
 -- {people: [{name, postal, phone?, location {lat,lng}}]}
@@ -94,6 +96,8 @@ postStartSearchR = do
 
 
   foundPlaces <- searchWithLocations $ map personLocation inputPeople
+  --liftIO $ mapM_ print $ map placeName foundPlaces
+  --liftIO $ print $ head foundPlaces
 
   -- Similar to peopleIds above, need to try finding entity in DB,
   -- or insert if doesn't exist.
