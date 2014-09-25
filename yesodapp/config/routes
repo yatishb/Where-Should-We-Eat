@@ -9,3 +9,4 @@
 /doSearch StartSearchR POST
 /search/#SearchId/people PeopleR GET
 /search/#SearchId/places PlacesR GET
+/isauthorized IsAuthorizedR GET

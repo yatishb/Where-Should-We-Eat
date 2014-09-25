@@ -95,7 +95,6 @@ instance Yesod App where
     isAuthorized (AuthR _) _ = return Authorized
     isAuthorized FaviconR _ = return Authorized
     isAuthorized RobotsR _ = return Authorized
-    isAuthorized HomeR _ = isLoggedIn
     -- Default to Authorized for now.
     isAuthorized _ _ = return Authorized
 
@@ -121,16 +120,6 @@ instance Yesod App where
 
     makeLogger = return . appLogger
 
-
-isLoggedIn = do
-    mbRgId <- runDB $ selectFirst [UserIdent ==. "richard.goulter@gmail.com"] []
-    let rgId = entityKey $ fromJust mbRgId
-    mu <- maybeAuthId
-    return $ case mu of
-        Nothing -> AuthenticationRequired
-        -- Just (Entity _ User{ entityVal = User {userIdent = "richard.goulter@gmail.com"}}) -> Authorized
-        Just rgId -> Authorized
-        Just _ -> Unauthorized "Nope"
 
 
 -- How to run database actions.
