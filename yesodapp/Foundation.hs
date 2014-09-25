@@ -133,9 +133,13 @@ instance YesodAuth App where
     type AuthId App = UserId
 
     -- Where to send a user after successful login
-    loginDest _ = HomeR
+    -- `html_index_html` refers to static/html/index.html,
+    -- which is the page for our app.
+    -- I don't know of another way to construct Route or StaticRoute
+    -- than just having a dummy file in this location
+    loginDest _ = StaticR html_index_html
     -- Where to send a user after logout
-    logoutDest _ = HomeR
+    logoutDest _ = StaticR html_index_html
 
     getAuthId creds = runDB $ do
         x <- getBy $ UniqueUser $ credsIdent creds
