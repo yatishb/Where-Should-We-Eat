@@ -47,12 +47,27 @@
 				$('#chosenParty').css('display','inline');
 			}
 		}
-
-
-
+		
+		function refreshRequestPartyView() {
+			document.getElementById('requestPartyForm').reset();
+			$('#partyRequestList').listview('refresh');
+			togglePartyView();
+			$('#requestParty').trigger("keyup");
+		}
+		
 		// run
 		$(document).on('click', '.ui-input-clear', function () {
 			togglePartyView();
+		});
+		
+		$(document).on('click', '.partyDelBtn', function() {
+			$(this).parent().remove();
+			$('#chosenParty').listview('refresh');
+		});
+		
+		$(document).on('click', '.conquestDelBtn', function() {
+			$(this).parent().remove();
+			$('#conquestsList').listview('refresh');
 		});
 
 		//Skynet.init();
@@ -114,15 +129,6 @@
 		</div>
 
 		<ul id="guildList" data-role="listview" data-autodividers="true" data-filter="true" data-filter-placeholder="Search" data-inset="true">
-			<!--
-			<li><a href="#">Adam Kinkaid</a></li>
-			<li><a href="#">Alex Wickerham</a></li>
-			<li><a href="#">Avery Johnson</a></li>
-			<li><a href="#">Bob Cabot</a></li>
-			<li><a href="#">Caleb Booth</a></li>
-			<li><a href="#">Christopher Adams</a></li>
-			<li><a href="#">Culver James</a></li>
-			-->
 		</ul>
 
 
@@ -132,7 +138,7 @@
 		<div data-role="header">
 			<h1><center>Conquests</center></h1>
 			<a href="#" id="conquestsEditButton" class="ui-btn-left" onclick="conquestsEditOnclick()">Edit</a>
-			<a href="#NewConquestOne" id="conquestsTopRightButton1" data-icon="action" class="ui-btn-right" data-iconpos="notext"></a>
+			<a href="#NewConquestOne" id="conquestsTopRightButton1" data-icon="action" class="ui-btn-right" data-iconpos="notext" onclick="refreshRequestPartyView()"></a>
 			<a href="#DeleteAllConquests" data-rel="popup" data-position-to="window" id="conquestsTopRightButton2" class="ui-btn-right" style="display:none">Delete All</a>
 
 			<div data-role="popup" id="DeleteAllConquests" data-overlay-theme="a" data-theme="a" class="ui-corner-all" data-dismissible="false">
@@ -149,12 +155,14 @@
 		</div>
 
 		<ul id="conquestsList" data-role="listview" data-filter="true" data-filter-placeholder="Search" data-inset="true" data-icon="false" data-split-icon="delete">
+			<!--
 			<li><a style="margin-right:0" href="#ConquestDetails">Conquest 1</a><a style="display:none" href="#"></a></li>
 			<li><a style="margin-right:0" href="#">Conquest 2</a><a style="display:none" href="#"></a></li>
 			<li><a style="margin-right:0" href="#">Conquest 3</a><a style="display:none" href="#"></a></li>
 			<li><a style="margin-right:0" href="#">Conquest 4</a><a style="display:none" href="#"></a></li>
 			<li><a style="margin-right:0" href="#">Conquest 5</a><a style="display:none" href="#"></a></li>
 			<li><a style="margin-right:0" href="#">Conquest 6</a><a style="display:none" href="#"></a></li>
+			-->
 		</ul>
 	</div>
 
@@ -183,21 +191,21 @@ hihihi
 	</div>
 
 	<p>
-	<h3><center>DATETIME</center></h3>
+	<h3><center><div id="conquestDetailsDateTime">DATETIME</div></center></h3>
 	</p>
 
 	<p>
-		<ul data-role="listview" data-inset="true">
+		<ul id="conquestDetailsDungeon" data-role="listview" data-inset="true">
 			<li><a href="#ConquestDungeon">
 				<img src="http://demos.jquerymobile.com/1.4.4/_assets/img/album-bb.jpg">
-			<h2>Restaurant Name</h2>
-		<p>some details, address, postal code, etc.</p></a>
+			<h2><div id="conquestDetailsDungeonName">Restaurant Name</div></h2>
+		<p><div id="conquestDetailsDungeonSub">some details, address, postal code, etc.</div></p></a>
 			</li>
 	</p>
 
 	Party Members:
 	<p>
-		<ul data-role="listview" data-inset="true">
+		<ul id="conquestDetailsParty" data-role="listview" data-inset="true">
 			<li><a href="#ConquestParty"><div style="float:left">Adam Kinkaid</div><div style="float:right">$50</div></a></li>
 			<li><a href="#">Alex Wickerham</a></li>
 			<li><a href="#">Avery Johnson</a></li>
@@ -240,25 +248,22 @@ hihihi
 		<a href="#NewConquestTwo" class="ui-btn-right" data-icon="arrow-r" data-iconpos="notext">Next</a>
 	</div>
 
-	<form class="ui-filterable">
+	<form class="ui-filterable" id="requestPartyForm">
 		<input id="requestParty" data-type="search" placeholder="Enter Postal Code or Name" oninput="togglePartyView()">
 	</form>
+	
 	<ul id="partyRequestList" data-role="listview" data-filter="true" data-filter-reveal="true" data-input="#requestParty" data-inset="true">
-	 <!-- If you click on da links, it gets added. Links are from contact-book -->
-	 <!--
-		<li><a href="#" onclick="alert('This gets added to the list below')">Demon Hunter</a></li>
-		<li><a href="#">Monk</a></li>
-		<li><a href="#">Barbarian</a></li>
-		<li><a href="#">Crusader</a></li>
-		<li><a href="#">Necromancer</a></li>
-		<li><a href="#">Assassin</a></li>
-	-->
 	</ul>
 
+	<!--
   <div data-role="fieldcontain" id="chosenParty">
     <fieldset data-role="controlgroup">
     </fieldset>
   </div>
+  -->
+  
+	<ul id="chosenParty" data-role="listview" data-inset="true" data-split-icon="delete" data-split-theme="a">
+	</ul>
 
 
 </div>
@@ -387,7 +392,7 @@ hihihi
 
 		var Skynet = {
 			guildIndex: window.localStorage.getItem("Skynet:guildIndex"),
-			//conquestIndex: window.localStorage.getItem("Skynet:conquestIndex"),
+			conquestIndex: window.localStorage.getItem("Skynet:conquestIndex"),
 			$guildForm: document.getElementById('newGuildForm'),
 			$guildFormEdit: document.getElementById('editGuildForm'),
 			$guildList: document.getElementById('guildList'),
@@ -407,9 +412,9 @@ hihihi
 				if (!Skynet.guildIndex) {
 					window.localStorage.setItem("Skynet:guildIndex", Skynet.guildIndex = 1);
 				}
-				/*if (!Skynet.conquestIndex) {
+				if (!Skynet.conquestIndex) {
 					window.localStorage.setItem("Skynet:conquestIndex", Skynet.conquestIndex = 1);
-				}*/
+				}
 
 				// initialize forms
 				Skynet.$guildForm.reset();
@@ -435,6 +440,7 @@ hihihi
 					Skynet.guildShow(entry);
 
 					$('#guildList').listview('refresh');
+					$('#partyRequestList').listview('refresh');
 					Skynet.$guildForm.reset();
 				}, true);
 				
@@ -446,11 +452,12 @@ hihihi
 						guildMobile: Skynet.$guildFormEdit.editGuildMobile.value
 					};
 					
-					Skynet.guildAdd(entry);
+					Skynet.guildEdit(entry);
 					Skynet.guildHide(entry);
 					Skynet.guildShow(entry);
 
 					$('#guildList').listview('refresh');
+					$('#partyRequestList').listview('refresh');
 					Skynet.$guildFormEdit.reset();
 				}, true);
 				
@@ -466,6 +473,7 @@ hihihi
 					Skynet.guildRemove(entry);
 					
 					$('#guildList').listview('refresh');
+					$('#partyRequestList').listview('refresh');
 					Skynet.$guildFormEdit.reset();
 				});
 				
@@ -501,11 +509,60 @@ hihihi
 				guildA.addEventListener("click", function(event) {	
 					window.location="#FriendDetails";
 					currentId = (guildLi.split("-"))[1];
-					friendData = window.localStorage.getItem("Skynet:g"+currentId);
-					document.getElementById('editGuildForm').editGuildName.value = JSON.parse(friendData).guildName;
-					document.getElementById('editGuildForm').editGuildPostal.value = JSON.parse(friendData).guildPostal;
-					document.getElementById('editGuildForm').editGuildMobile.value = JSON.parse(friendData).guildMobile;
-					document.getElementById('editGuildForm').editGuildIndex.value = currentId;
+					friendData = JSON.parse(window.localStorage.getItem("Skynet:g"+currentId));
+					currentGuildForm = document.getElementById('editGuildForm');
+					
+					// express data into document
+					currentGuildForm.editGuildName.value = friendData.guildName;
+					currentGuildForm.editGuildPostal.value = friendData.guildPostal;
+					currentGuildForm.editGuildMobile.value = friendData.guildMobile;
+					currentGuildForm.editGuildIndex.value = currentId;
+				});
+			},
+			
+			addPartyListener: function(guildLi) {
+				guildA = (document.getElementById(guildLi)).firstChild;
+				guildA.addEventListener("click", function(event) {
+					id = (guildLi.split('-'))[1];
+					name = JSON.parse(window.localStorage.getItem('Skynet:g' + id)).guildName;
+					$li = $("<li />")
+						.attr('id', 'partyNumber-' + id)
+					$a = $('<a />')
+						.attr('href', '#')
+						.text(name);
+					$delbtn = $("<a />")
+						.attr('href', '#')
+						.attr('class', 'partyDelBtn');
+					$li.append($a).append($delbtn);
+					$('#chosenParty').append($li);
+					$('#chosenParty').listview('refresh');
+					
+					refreshRequestPartyView();
+				});
+			},
+			
+			addConquestListener: function(conquestLi) {
+				conquestA = (document.getElementById(conquestLi)).firstChild;
+				conquestA.addEventListener("click", function(event) {
+					currentId = (conquestLi.split('-'))[1];
+					window.location = "#conquestDetails";
+					conquestData = JSON.parse(window.localStorage.getItem("Skynet:c"+currentId));
+					
+					conquestParty = conquestData.conquestParty;
+				
+					// express data into document
+					// conquestData: dungeonName, dateTime, conquestParty[guild]
+					//conquestDetailsDateTime, conquestDetailsDungeon, conquestDetailsParty, conquestDetailsDungeonSub, conquestDetailsDungeonName
+					
+					$('#conquestDetailsDateTime').text(conquestData.dateTime.toLocaleString());
+					$('#conquestDetailsDungeonName').text(conquestData.dungeonName);
+					
+					for (i=0;i<conquestParty.length;i++) {
+						$partyLi = $('<li />')
+							.text(conquestParty[i].guildName);
+						$('#conquestDetailsParty').append($partyLi);
+					}
+				
 				});
 			},
 
@@ -523,19 +580,20 @@ hihihi
 			guildRemove: function(entry) {
 				window.localStorage.removeItem("Skynet:g"+ entry.guildId);
 			},
-			/*
+			
 			conquestAdd: function(entry) {
-
+				window.localStorage.setItem("Skynet:conquestIndex", ++Skynet.conquestIndex);
+				window.localStorage.setItem("Skynet:c"+entry.conquestId, JSON.stringify(entry));
 			},
 
 			conquestEdit: function(entry) {
-
+				window.localStorage.setItem("Skynet:c"+entry.conquestId, JSON.stringify(entry));
 			},
 
 			conquestRemove: function(entry) {
-
+				window.localStorage.removeItem("Skynet:c"+ entry.conquestId);
 			},
-			*/
+			
 
 			// governing representation/output
 
@@ -546,6 +604,12 @@ hihihi
 					.text(entry.guildName);
 				$li.append($a);
 				
+				$li2 = $("<li />").attr('id', 'guildNumber2-' + entry.guildId);
+				$a2 = $("<a />")
+					.attr('href', '#')
+					.text(entry.guildName);
+				$li2.append($a2);
+				
 				var added = false;
 				$('#guildList').children().each(function(i) {
 					if(entry.guildName.toUpperCase() < $(this).text().toUpperCase()) {
@@ -554,12 +618,20 @@ hihihi
 						return false;
 					}
 				});
+				$('#partyRequestList').children().each(function(i) {
+					if(entry.guildName.toUpperCase() < $(this).text().toUpperCase()) {
+						$li2.insertBefore($(this));
+						added = true;
+						return false;
+					}
+				});
 				if (!added) {
 					$('#guildList').append($li);
+					$('#partyRequestList').append($li2);
 				}
 				
 				Skynet.addGuildListener('guildNumber-' + entry.guildId);
-
+				Skynet.addPartyListener('guildNumber2-' + entry.guildId);
 			},
 
 			guildModify: function(entry) {
@@ -568,10 +640,28 @@ hihihi
 
 			guildHide: function(entry) {
 				$("#guildNumber-" + entry.guildId).remove();
+				$("#guildNumber2-" + entry.guildId).remove();
 			},
-			/*
+			
 			conquestShow: function(entry) {
-
+				// <li><a style="margin-right:0" href="#ConquestDetails">Conquest 1</a><a style="display:none" href="#"></a></li>
+				// #conquestsList
+				
+				$li = $('<li />').attr('id', 'conquestNumber-' + entry.conquestId);
+				$a = $('<a />')
+					.attr('style', 'margin-right:0')
+					.attr('href', "#")
+					.text(entry.dungeonName);
+				$delbtn = $('<a />')
+					.attr('style', 'display:none')
+					.attr('class', 'conquestDelBtn')
+					.attr('href', '#');
+				$li.append($a).append($delbtn);
+				
+				$('#conquestsList').append($li);
+				$('#conquestsList').listview('refresh');
+				
+				Skynet.addConquestListener('conquestNumber-' + entry.conquestId);
 			},
 
 			conquestModify: function(entry) {
@@ -579,9 +669,9 @@ hihihi
 			},
 
 			conquestHide: function(entry) {
-
+				$("#conquestNumber-" + entry.conquestId).remove();
 			}
-			*/
+			
 		};
 
 
