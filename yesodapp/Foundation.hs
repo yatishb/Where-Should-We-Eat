@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Foundation where
 
 import Prelude
@@ -5,6 +7,7 @@ import Yesod
 import Yesod.Static
 import Yesod.Auth
 import Yesod.Auth.BrowserId
+import Yesod.Auth.GoogleEmail
 import Yesod.Default.Config
 import Yesod.Default.Util (addStaticContentExternal)
 import Network.HTTP.Client.Conduit (Manager, HasHttpManager (getHttpManager))
@@ -18,6 +21,7 @@ import Model
 import Text.Jasmine (minifym)
 import Text.Hamlet (hamletFile)
 import Yesod.Core.Types (Logger)
+import Data.Maybe (fromJust)
 
 -- | The site argument for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -91,6 +95,7 @@ instance Yesod App where
     isAuthorized (AuthR _) _ = return Authorized
     isAuthorized FaviconR _ = return Authorized
     isAuthorized RobotsR _ = return Authorized
+    isAuthorized HomeR _ = isLoggedIn
     -- Default to Authorized for now.
     isAuthorized _ _ = return Authorized
 
@@ -115,6 +120,18 @@ instance Yesod App where
         development || level == LevelWarn || level == LevelError
 
     makeLogger = return . appLogger
+
+
+isLoggedIn = do
+    mbRgId <- runDB $ selectFirst [UserIdent ==. "richard.goulter@gmail.com"] []
+    let rgId = entityKey $ fromJust mbRgId
+    mu <- maybeAuthId
+    return $ case mu of
+        Nothing -> AuthenticationRequired
+        -- Just (Entity _ User{ entityVal = User {userIdent = "richard.goulter@gmail.com"}}) -> Authorized
+        Just rgId -> Authorized
+        Just _ -> Unauthorized "Nope"
+
 
 -- How to run database actions.
 instance YesodPersist App where
@@ -142,7 +159,8 @@ instance YesodAuth App where
                     }
 
     -- You can add other plugins like BrowserID, email or OAuth here
-    authPlugins _ = [authBrowserId def]
+    -- authPlugins _ = [authBrowserId def]
+    authPlugins _ = [authGoogleEmail]
 
     authHttpManager = httpManager
 
