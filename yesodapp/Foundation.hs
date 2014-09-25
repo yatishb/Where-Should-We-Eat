@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Foundation where
 
 import Prelude
@@ -5,6 +7,7 @@ import Yesod
 import Yesod.Static
 import Yesod.Auth
 import Yesod.Auth.BrowserId
+import Yesod.Auth.GoogleEmail
 import Yesod.Default.Config
 import Yesod.Default.Util (addStaticContentExternal)
 import Network.HTTP.Client.Conduit (Manager, HasHttpManager (getHttpManager))
@@ -18,6 +21,7 @@ import Model
 import Text.Jasmine (minifym)
 import Text.Hamlet (hamletFile)
 import Yesod.Core.Types (Logger)
+import Data.Maybe (fromJust)
 
 -- | The site argument for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -116,6 +120,8 @@ instance Yesod App where
 
     makeLogger = return . appLogger
 
+
+
 -- How to run database actions.
 instance YesodPersist App where
     type YesodPersistBackend App = SqlPersistT
@@ -127,9 +133,13 @@ instance YesodAuth App where
     type AuthId App = UserId
 
     -- Where to send a user after successful login
-    loginDest _ = HomeR
+    -- `html_index_html` refers to static/html/index.html,
+    -- which is the page for our app.
+    -- I don't know of another way to construct Route or StaticRoute
+    -- than just having a dummy file in this location
+    loginDest _ = StaticR html_index_html
     -- Where to send a user after logout
-    logoutDest _ = HomeR
+    logoutDest _ = StaticR html_index_html
 
     getAuthId creds = runDB $ do
         x <- getBy $ UniqueUser $ credsIdent creds
@@ -142,7 +152,8 @@ instance YesodAuth App where
                     }
 
     -- You can add other plugins like BrowserID, email or OAuth here
-    authPlugins _ = [authBrowserId def]
+    -- authPlugins _ = [authBrowserId def]
+    authPlugins _ = [authGoogleEmail]
 
     authHttpManager = httpManager
 
