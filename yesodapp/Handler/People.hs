@@ -3,10 +3,28 @@ module Handler.People where
 import Import
 import Data.Aeson.Types
 import Data.Maybe (catMaybes)
+import Yesod.Auth
 import qualified Data.Vector as V
 
 getPeopleR :: SearchId -> Handler Value
 getPeopleR searchId = do
+    maid <- maybeAuthId
+    case maid of
+        Nothing ->
+            notAuthenticated
+        Just authId -> do
+            -- Check that authId and searchId is in table.
+            maybeAuthd <- runDB $ selectFirst [AuthorizedForUserId ==. authId,
+                                               AuthorizedForSearchId ==. searchId]
+                                              []
+            case maybeAuthd of
+                Nothing ->
+                    permissionDenied "Not authorised for this search id."
+                Just _  ->
+                    authenticatedGetPeopleR searchId
+
+authenticatedGetPeopleR :: SearchId -> Handler Value
+authenticatedGetPeopleR searchId = do
   -- read up on http://hackage.haskell.org/package/persistent-1.3.3/docs/Database-Persist-Class.html
 
   -- Get the corresponding row from the Id

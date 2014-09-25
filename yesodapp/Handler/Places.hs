@@ -3,10 +3,29 @@ module Handler.Places where
 import Import
 import Data.Aeson.Types
 import Data.Maybe (catMaybes)
+import Yesod.Auth
 import qualified Data.Vector as V
 
+-- Would the Maybe monad make this code cleaner?
 getPlacesR :: SearchId -> Handler Value
 getPlacesR searchId = do
+    maid <- maybeAuthId
+    case maid of
+        Nothing ->
+            notAuthenticated
+        Just authId -> do
+            -- Check that authId and searchId is in table.
+            maybeAuthd <- runDB $ selectFirst [AuthorizedForUserId ==. authId,
+                                               AuthorizedForSearchId ==. searchId]
+                                              []
+            case maybeAuthd of
+                Nothing ->
+                    permissionDenied "Not authorised for this search id."
+                Just _  ->
+                    authenticatedGetPlacesR searchId
+
+authenticatedGetPlacesR :: SearchId -> Handler Value
+authenticatedGetPlacesR searchId = do
   -- Get the corresponding row from the Id
   maybeSearchEntry <- runDB $ get searchId
 
