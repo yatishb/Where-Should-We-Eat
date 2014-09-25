@@ -365,7 +365,7 @@ hihihi
 	
 	<br>
 	<br>
-	<a href="#PageOne" id="guildDeleteButon" class="ui-btn">Delete Friend</a>
+	<a href="#PageOne" id="guildDeleteButton" class="ui-btn">Delete Friend</a>
 </div>
 
 
@@ -446,8 +446,6 @@ hihihi
 						guildMobile: Skynet.$guildFormEdit.editGuildMobile.value
 					};
 					
-					console.log(entry);
-
 					Skynet.guildAdd(entry);
 					Skynet.guildHide(entry);
 					Skynet.guildShow(entry);
@@ -455,6 +453,21 @@ hihihi
 					$('#guildList').listview('refresh');
 					Skynet.$guildFormEdit.reset();
 				}, true);
+				
+				Skynet.$button_deleteGuild.addEventListener("click", function(event) {				
+					var entry = {
+						guildId: Skynet.$guildFormEdit.editGuildIndex.value,
+						guildName: Skynet.$guildFormEdit.editGuildName.value,
+						guildPostal: Skynet.$guildFormEdit.editGuildPostal.value,
+						guildMobile: Skynet.$guildFormEdit.editGuildMobile.value
+					};
+					
+					Skynet.guildHide(entry);
+					Skynet.guildRemove(entry);
+					
+					$('#guildList').listview('refresh');
+					Skynet.$guildFormEdit.reset();
+				});
 				
 
 				// initialize display
