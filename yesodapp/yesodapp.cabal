@@ -25,6 +25,7 @@ library
                      Handler.People
                      Handler.Places
                      Handler.IsAuthorized
+                     Handler.SearchHistory
                      Location
                      Yelp
                      Distances

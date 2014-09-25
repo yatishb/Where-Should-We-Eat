@@ -10,3 +10,4 @@
 /search/#SearchId/people PeopleR GET
 /search/#SearchId/places PlacesR GET
 /isauthorized IsAuthorizedR GET
+/search/history SearchHistoryR GET
