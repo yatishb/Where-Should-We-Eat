@@ -5,6 +5,7 @@ module Handler.StartSearch where
 import Import
 
 import Data.Attoparsec.Number
+import Data.Maybe
 import Data.Aeson
 import Data.Aeson.Types (Result, Array)
 import Data.Vector ((!?))
@@ -18,13 +19,13 @@ import GHC.Generics
 import Handler.GeoCode
 import qualified Location as Loc
 import Yelp
+import Distances
 
 -- Will probably need to incorporate some monad return
 -- in order to utilize search.
 searchWithLocations :: MonadIO m => [Loc.Location] -> m [Place]
 searchWithLocations locations = 
   search $ Loc.averageLocation locations
-  --return []
 
 -- Input, structured as:
 -- {people: [{name, postal, phone?, location {lat,lng}}]}
@@ -96,8 +97,6 @@ postStartSearchR = do
 
 
   foundPlaces <- searchWithLocations $ map personLocation inputPeople
-  --liftIO $ mapM_ print $ map placeName foundPlaces
-  --liftIO $ print $ head foundPlaces
 
   -- Similar to peopleIds above, need to try finding entity in DB,
   -- or insert if doesn't exist.
@@ -107,9 +106,10 @@ postStartSearchR = do
               (ensureInDBandGetIdWith selectPlaceFilterFor)
               foundPlaces
 
-  -- TODO: TaxiFare (What type???)
-  -- TODO: Put into SearchPlace table.
+  
 
+  -- Number is the type Aeson uses for its JSON,
+  -- fromIntegral coerces between number types.
   let newSearch = Search
                   { searchPeople = peopleIds
                   , searchFilters = []
@@ -123,8 +123,22 @@ postStartSearchR = do
       grabInt64 (PersistInt64 x) = x
       keyInt64 = grabInt64 keyPersistValue
 
-  -- Number is the type Aeson uses for its JSON,
-  -- fromIntegral coerces between number types.
+
+
+  -- TO GET DISTANCE & INSERT INTO SEARCHPLACE TABLE
+  -- Extract all destination locations
+  let grabInt64 (PersistInt64 x) = x
+      placeNumbers = map (\x -> grabInt64 $ unKey x) placeIds
+  maybePlaceLocs <- mapM (\p -> runDB $ get p) placeIds
+  let placeLocs = map placeLocation $ catMaybes maybePlaceLocs
+  --Extract all origin locations
+      originLocs = map personLocation inputPeople
+  -- Get all distance. Retrieves array of arrays
+  allDistances <- mapM (\d -> getDistancesOriginListToDestination originLocs d) placeLocs
+  --Insert into SearchPlace table
+  let input1 = zip placeIds allDistances
+  mapM_ (\(p,d) -> runDB $ insert $ SearchPlace newSearchId p d) input1
+
 
   -- Return {searchId: int}
   return $ object ["searchId" .= (fromIntegral keyInt64 :: Number)]

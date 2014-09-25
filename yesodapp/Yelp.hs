@@ -1,29 +1,23 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE DeriveGeneric #-}
 module Yelp where
 
-import Control.Monad.IO.Class  (liftIO)
+import Import
 import Data.Maybe
 import Network.OAuth.Consumer
 import Network.OAuth.Http.Request
 import Network.OAuth.Http.Response
-import Network.OAuth.Http.HttpClient
 import Network.OAuth.Http.CurlHttpClient
-import Network.Curl
-import Network.HTTP.Base
 import qualified Data.ByteString.Lazy as L
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Char8 as BC8
-import Location
-import GHC.Generics
-import Data.Aeson
-import Data.Vector ((!?))
 import qualified Data.Vector as V
 import qualified Data.Text as T
 import qualified Data.HashMap.Strict as M
-import Import
 import qualified Handler.GeoCode as G
+import Location
+import Data.Aeson
+import Data.Vector ((!?))
 
 
 -- Yelp Credential Details
@@ -42,6 +36,7 @@ data Consumer = Consumer
     , secret :: String }
     deriving (Show, Eq)
 
+yelpRequest :: MonadIO m => String -> String -> m L.ByteString
 yelpRequest path urlparam = do
     {-
     Arguments : path (whether need to use search api or business api)
@@ -80,18 +75,12 @@ toDouble v@(Number val) = read valStr
 toString :: Value -> String
 toString v@(String val) = T.unpack val
 
+concatenate :: Value -> String
 concatenate v@(Array val) = concat $ map toString $ V.toList val
 
 
-{-data Place = Place
-             { yelpname :: String
-             , location :: Location
-             , yelpid :: String
-             , imgurl :: String
-             } deriving (Show, Read, Eq, Generic) -}
-
 -- Extract a GeoLocation from the JSON Value,
--- first by checking , then , then .address
+-- first by checking coordinate, then postalcode, then address
 --
 -- Use Maybe for robustness; there's a tiny chance a Yelp
 -- directory won't have an Address which we can find.
