@@ -56,6 +56,9 @@ function ResultDisplay(input_map){
     $.get('/search/' + searchId + '/people', setUserMarkers);
 
     //TODO Add get for places here
+    $.get('/search/' + searchId + '/places', function(data){
+      console.log(data);
+    })
     setPlaceDetails();
   }
 
@@ -76,79 +79,15 @@ function ResultDisplay(input_map){
   }
 
   function optionClickHandler(index){
-    var option_details = placeDetails[index];
 
-    var myLatLng = new google.maps.LatLng(
-      option_details.lat,option_details.lng);
-
-    if(placeMarker) {placeMarker.setMap(null)};
-
-    placeMarker = new google.maps.Marker({
-      position: myLatLng,
-      title: option_details.name,
-      animation: google.maps.Animation.DROP,
-    });
-
-    placeMarker.setMap(googleMap);
-
-    var bound = new google.maps.LatLngBounds();
-
-    for (var i=0; i<userMarkers.length; i++){
-      bound.extend(userMarkers[i].position);
-    }
-
-    bound.extend(placeMarker.position);
-
-    googleMap.setCenter(bound.getCenter());
-    googleMap.fitBounds(bound);
-
-    polylineIndex = 0;
-
-    directionRenderers.forEach(function(val){
-      val.setMap(null);
-    })
-    directionRenderers.length = 0;
+    setPlaceMarker(index);
+    setBounds();
+    clearDirectionRenderers();
 
     if(directionsMatrix[index].length === 0){
-      var i = 0;
-
-      function syncLoop(){
-
-        setTimeout(function() {
-          var request = {
-            origin: placeMarker.position,
-            destination: userMarkers[i].position,
-            travelMode: google.maps.TravelMode.DRIVING
-          }
-          directionsService.route(request, function(response, status){
-            if (status === google.maps.DirectionsStatus.OK) {
-              var directionRenderer = new google.maps.DirectionsRenderer({
-                suppressMarkers: true,
-                polylineOptions: generatePolyline(),
-                preserveViewport: true
-              });
-              directionRenderer.setDirections(response);
-              directionsMatrix[index].push(directionRenderer);
-              directionRenderer.setMap(googleMap);
-              directionRenderers.push(directionRenderer);
-            } else {
-              //Over query limit error to be handled.
-            }
-          });
-          i++;
-          if(i<userMarkers.length){
-            syncLoop();
-          }
-        }, this.timeoutTime); //Timeout to minimize likelihood of exceeding query limit
-      }
-
-      syncLoop();
-
+      directionQueryLoop(0, index);
     } else {
-        for(var i=0; i<directionsMatrix[index].length; i++){
-          directionsMatrix[index][i].setMap(googleMap);
-          directionRenderers.push(directionsMatrix[index][i]);
-        }
+      setExistingDirectionRenderers(index);
     }
 
   }
@@ -163,9 +102,7 @@ function ResultDisplay(input_map){
   }
 
   function setUserMarkers(data){
-
     console.log(data);
-
     userMarkers = data.people.map(function(val){
       return new google.maps.Marker({
         position: new google.maps.LatLng(
@@ -176,15 +113,8 @@ function ResultDisplay(input_map){
         map: googleMap
       })
     })
-
-    var bound = new google.maps.LatLngBounds();
-    for (var i=0; i<userMarkers.length; i++){
-      bound.extend(userMarkers[i].position);
-    }
-    googleMap.setCenter(bound.getCenter());
-    googleMap.fitBounds(bound);
-
     userDetails = data.people;
+    setBounds();
   }
 
   function setPlaceDetails(){
@@ -232,6 +162,86 @@ function ResultDisplay(input_map){
         googleMap.setCenter(center);
       }
     });
+  }
+
+  function setPlaceMarker(index){
+    var option_details = placeDetails[index];
+
+    var myLatLng = new google.maps.LatLng(
+      option_details.lat,option_details.lng);
+
+    if(placeMarker) {placeMarker.setMap(null)};
+
+    placeMarker = new google.maps.Marker({
+      position: myLatLng,
+      title: option_details.name,
+      animation: google.maps.Animation.DROP,
+    });
+
+    placeMarker.setMap(googleMap);
+  }
+
+  function setBounds(){
+    var bound = new google.maps.LatLngBounds();
+
+    for (var i=0; i<userMarkers.length; i++){
+      bound.extend(userMarkers[i].position);
+    }
+
+    if(placeMarker){bound.extend(placeMarker.position);}
+
+    googleMap.setCenter(bound.getCenter());
+    googleMap.fitBounds(bound);
+  }
+
+  function clearDirectionRenderers(){
+    directionRenderers.forEach(function(val){
+      val.setMap(null);
+    })
+    directionRenderers.length = 0;
+    polylineIndex = 0;
+  }
+
+  function setNewDirectionRenderer(response, index){
+    var directionRenderer = new google.maps.DirectionsRenderer({
+      suppressMarkers: true,
+      polylineOptions: generatePolyline(),
+      preserveViewport: true
+    });
+    directionRenderer.setDirections(response);
+    directionsMatrix[index].push(directionRenderer);
+    directionRenderer.setMap(googleMap);
+    directionRenderers.push(directionRenderer);
+  }
+
+  function setExistingDirectionRenderers(index){
+    for(var i=0; i<directionsMatrix[index].length; i++){
+      directionsMatrix[index][i].setMap(googleMap);
+      directionRenderers.push(directionsMatrix[index][i]);
+    }
+  }
+
+  //Sends direction query from each user position
+  //with a time out time to avoid triggering query failure
+  //due to Google rate limits
+  function directionQueryLoop(i, index){
+    setTimeout(function() {
+      var request = {
+        origin: placeMarker.position,
+        destination: userMarkers[i].position,
+        travelMode: google.maps.TravelMode.DRIVING
+      }
+      directionsService.route(request, function(response, status){
+        if (status === google.maps.DirectionsStatus.OK) {
+          setNewDirectionRenderer(response, index);
+        } else {
+          //Over query limit error to be handled.
+        }
+      });
+      if(++i<userMarkers.length){
+        directionQueryLoop(i, index);
+      }
+    }, timeoutTime);
   }
 
 }
