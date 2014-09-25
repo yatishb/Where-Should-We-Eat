@@ -10,7 +10,7 @@ Email
     UniqueEmail email
 Person
     name String
-    postal Int
+    postal String
     phone Int Maybe
     location Location
     deriving Show
