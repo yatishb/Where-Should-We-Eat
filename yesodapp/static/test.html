@@ -150,6 +150,45 @@
 
 
 
+    QUnit.asyncTest("/doSearch, w/ Jishnu's input", function( assert ) {
+      expect( 2 ); // number of assertions in this async test.
+
+      var warrior = {"name": "Warrior",  "postal": "408600"};
+      var cleric  = {"name": "Cleric",   "postal": "088278"};
+      var ranger  = {"name": "Ranger",   "postal": "129770"};
+
+      console.log("Jishnu Do Search");
+      $.post("../doSearch",
+             JSON.stringify({
+               "people": [warrior, cleric, ranger]
+             }),
+             gotBackFromDoSearch);
+
+      function gotBackFromDoSearch(response) {
+        console.log("** /doSearch callback **");
+        console.log("RES:" + response);
+        console.log(JSON.stringify(response));
+
+        var searchId = response.searchId;
+
+        $.get("../search/" + searchId + "/places",
+              "",
+              gotBackFromGetSearchPlaces);
+      }
+
+      function gotBackFromGetSearchPlaces(response) {
+        console.log("** /search/#SearchId/places callback **");
+        console.log("RES:" + response);
+        console.log(JSON.stringify(response));
+
+        assert.ok( !response.error, "response contains no error, search with given id exists" );
+        assert.ok( response.places.length > 0, "response finds more than 0 places, gets them." );
+
+        QUnit.start();
+      }
+    });
+
+
     </script>
   </body>
 </html>
