@@ -15,26 +15,60 @@ import qualified Data.Text as T
 import qualified Data.Vector as V
 import GHC.Generics
 
+import Handler.GeoCode
+import qualified Location as Loc
+import Yelp
+
+-- Will probably need to incorporate some monad return
+-- in order to utilize search.
+searchWithLocations :: MonadIO m => [Loc.Location] -> m [Place]
+searchWithLocations locations = 
+  search $ Loc.averageLocation locations
+  --return []
+
 -- Input, structured as:
 -- {people: [{name, postal, phone?, location {lat,lng}}]}
 -- unfortunate JSON name.
+
+-- Special structure for input,
+-- (Because it's annoying to demand personLocation input from
+--  initial POST, absurd to keep it as Maybe).
+data InputPerson = InputPerson
+                   { name :: String
+                   , postal :: String
+                   , phone :: Maybe Int
+                   } deriving (Generic)
+
+-- Person isn't input with GeoLocation, so
+-- we compute
+personFromInput :: MonadIO m => InputPerson -> m Person
+personFromInput input = do
+  loc <- geocode $ show $ postal input
+  return Person { personName = name input
+                , personPostal = postal input
+                , personPhone = phone input
+                , personLocation = loc
+                }
+
 data Input = Input
-             { people :: [Person]
+             { people :: [InputPerson]
              } deriving (Generic)
 
 instance ToJSON Input
 instance FromJSON Input
+instance ToJSON InputPerson
+instance FromJSON InputPerson
 
--- From the fantastic http://dev.stephendiehl.com/hask/
--- Pull a key out of an JSON object.
-(^?) :: Value -> T.Text -> Maybe Value
-(^?) (Object obj) k = M.lookup k obj
-(^?) _ _ = Nothing
-
--- Pull the ith value out of a JSON list.
-ix :: Value -> Int -> Maybe Value
-ix (Array arr) i = arr !? i
-ix _ _ = Nothing
+ensureInDBandGetIdWith selectFilterFor p = do
+  maybeEntity <- runDB $ selectFirst (selectFilterFor p) []
+  case maybeEntity of
+    Just e ->
+      -- previously in DB
+      return $ entityKey e
+    Nothing ->
+      -- wasn't previously in DB
+      -- So, need to insert it.
+      runDB $ insert p
 
 postStartSearchR :: Handler Value
 postStartSearchR = do
@@ -43,9 +77,7 @@ postStartSearchR = do
   -- Until API is fixed, just use raw JSON Value.
   inputJSON <- requireJsonBody
 
-  -- "Dangerous" to use fromJust..
-  -- once API fixed, can move to generic fromJSON
-  let inputPeople = people inputJSON
+  inputPeople <- mapM personFromInput $ people inputJSON
 
   -- Get PeopleId for the corresponding input from Database
   -- where the row has a phonenumber,
@@ -53,34 +85,38 @@ postStartSearchR = do
   -- :: [Key Person] a.k.a [PersonId]
   -- selectKeysList is a bitch. :/
 
-
   let nameAndPostalFilter p = [ PersonName   ==. (personName p)
                               , PersonPostal ==. (personPostal p)]
       phoneNumberFilter   p = [ PersonPhone  ==. (personPhone p)]
       selectPersonFilterFor  p = (nameAndPostalFilter p) ||. (phoneNumberFilter p)
 
   peopleIds <- mapM
-               (\p ->do
-                 maybePersonEntity <- runDB $ selectFirst (selectPersonFilterFor p) []
-                 case maybePersonEntity of
-                   Just personEntity ->
-                    -- Person previously in DB
-                    return $ entityKey personEntity
-                   Nothing ->
-                    -- Person wasn't previously in DB
-                    -- So, need to insert them.
-                    runDB $ insert p)
+               (ensureInDBandGetIdWith selectPersonFilterFor)
                inputPeople
+
+
+  foundPlaces <- searchWithLocations $ map personLocation inputPeople
+  --liftIO $ mapM_ print $ map placeName foundPlaces
+  --liftIO $ print $ head foundPlaces
+
+  -- Similar to peopleIds above, need to try finding entity in DB,
+  -- or insert if doesn't exist.
+  let selectPlaceFilterFor p = [PlaceYelpid ==. (placeYelpid p)]
+
+  placeIds <- mapM
+              (ensureInDBandGetIdWith selectPlaceFilterFor)
+              foundPlaces
+
+  -- TODO: TaxiFare (What type???)
+  -- TODO: Put into SearchPlace table.
 
   let newSearch = Search
                   { searchPeople = peopleIds
                   , searchFilters = []
                   , searchChosen = Nothing
-                  , searchPlaces = []
+                  , searchPlaces = placeIds
                   }
   newSearchId <- runDB $ insert newSearch
-
-  -- TODO: Need to go away and update searchPlaces later.
 
   -- PersistInt64, which is a PersistValue
   let keyPersistValue = unKey newSearchId
