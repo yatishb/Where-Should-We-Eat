@@ -10,6 +10,11 @@
     <script src="//code.jquery.com/qunit/qunit-1.15.0.js"></script>
 
     <script>
+      function assertLocationInSingapore(assert, loc) {
+          assert.ok( Math.abs(loc.lat - 1) < 2.0 &&
+                     Math.abs(loc.lng - 103) < 2.0, "Lat, Lng ~ 1, 103");
+      }
+
       // Fuck, API changed.
       // "phone" is optional,
       // "location" is ignored, computed serverside.
@@ -22,7 +27,7 @@
       testGeocode.forEach(function(geocodeInput) {
         var inputPostcode = geocodeInput.postcode;
         QUnit.asyncTest("/geocode for " + inputPostcode, function( assert ) {
-          expect( 2 ); // number of assertions in this async test.
+          expect( 3 ); // number of assertions in this async test.
 
           // Check to 3 or 4 decimal places, should be okay.
 
@@ -44,6 +49,7 @@
 
             assert.ok( Math.abs( expectedLat - lat) < acceptableError, "lat okay" );
             assert.ok( Math.abs( expectedLng - lng) < acceptableError, "lng okay" );
+            assertLocationInSingapore(assert, response);
 
             QUnit.start();
           }
@@ -52,7 +58,7 @@
 
 
       QUnit.asyncTest("/geocode for Line 31", function( assert ) {
-        expect( 2 ); // number of assertions in this async test.
+        expect( 3 ); // number of assertions in this async test.
 
         // Check to 3 or 4 decimal places, should be okay.
 
@@ -66,6 +72,8 @@
         // * (Nginx) rewrite rules..
 
         function gotBackFromGeocode(response) {
+          console.log("From /geocode/" + inputAddress + ", got " +
+                      JSON.stringify(response));
           var lat = response.lat;
           var lng = response.lng;
 
@@ -76,6 +84,39 @@
 
           assert.ok( Math.abs( expectedLat - lat) < acceptableError, "lat okay" );
           assert.ok( Math.abs( expectedLng - lng) < acceptableError, "lng okay" );
+          assertLocationInSingapore(assert, response);
+
+          QUnit.start();
+        }
+      });
+
+
+      QUnit.asyncTest("/geocode for cafe le caire, from Yelp PC 199736", function( assert ) {
+        expect( 3 ); // number of assertions in this async test.
+
+        // Check to 3 or 4 decimal places, should be okay.
+
+        // Actual PostCode for cafe: 199738. What the fuck, Yelp. What the fuck.
+        var inputAddress = "199736";
+
+        $.get("../geocode/" + inputAddress,
+              "",
+              gotBackFromGeocode);
+
+        function gotBackFromGeocode(response) {
+          console.log("From /geocode/" + inputAddress + ", got " +
+                      JSON.stringify(response));
+          var lat = response.lat;
+          var lng = response.lng;
+
+          var expectedLat = 1.300;
+          var expectedLng = 103.859;
+
+          var acceptableError = 0.001;
+
+          assert.ok( Math.abs( expectedLat - lat) < acceptableError, "lat okay" );
+          assert.ok( Math.abs( expectedLng - lng) < acceptableError, "lng okay" );
+          assertLocationInSingapore(assert, response);
 
           QUnit.start();
         }
