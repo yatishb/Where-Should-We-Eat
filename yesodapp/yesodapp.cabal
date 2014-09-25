@@ -26,6 +26,7 @@ library
                      Handler.Places
                      Location
                      Yelp
+                     Distances
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT
