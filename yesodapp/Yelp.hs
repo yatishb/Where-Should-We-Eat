@@ -90,6 +90,40 @@ concatenate v@(Array val) = concat $ map toString $ V.toList val
              , imgurl :: String
              } deriving (Show, Read, Eq, Generic) -}
 
+-- Extract a GeoLocation from the JSON Value,
+-- first by checking , then , then .address
+--
+-- Use Maybe for robustness; there's a tiny chance a Yelp
+-- directory won't have an Address which we can find.
+extractLocationFromJSONLocation :: MonadIO m => Value -> m (Maybe Location)
+extractLocationFromJSONLocation location = do
+    let maybeCoord      = location ^? "coordinate"
+        maybePostalCode = location ^? "postal_code"
+        maybeAddress    = location ^? "address"
+
+    -- Can't sugar this using the Maybe monad + do notation, unfortunately.
+    case maybeCoord of
+        Just val ->
+            return $ Just Location { lat = toDouble $ fromJust $ val ^? "latitude"
+                                   , lng = toDouble $ fromJust $ val ^? "longitude"
+                                   }
+        Nothing ->
+            -- No "coordinate"; try postal_code
+            case maybePostalCode of
+                Just val -> do
+                    geoloc <- G.geocode $ toString val
+                    return $ Just geoloc
+                Nothing ->
+                    case maybeAddress of
+                        Nothing -> return Nothing
+                        Just val -> do
+                            -- Address is like
+                            -- ["342 Evergreen Terrace", "Springfield"]
+                            -- which we can try to give to our geocode
+                            geoloc <- G.geocode $ concatenate val
+                            return $ Just geoloc
+
+
 extractplace :: MonadIO m => Value -> m Place
 extractplace placeObject = do
     {-
@@ -99,8 +133,9 @@ extractplace placeObject = do
     let name = toString ( fromMaybe (error "no name found") $ placeObject ^? "name" )
         yelpid = toString ( fromMaybe (error "no yelpid found") $ placeObject ^? "id" )
         imgurl = toString ( fromMaybe "noimage" $ placeObject ^? "image_url" )
-        address = urlEncode( concatenate (fromMaybe (error "no address found") $ (fromMaybe (error "no location found") $ placeObject ^? "location") ^? "address" ) )
-    loc <- G.geocode address
+        location = fromMaybe (error "no location found") $ placeObject ^? "location"
+    maybeLoc <- extractLocationFromJSONLocation location
+    let loc = fromMaybe (error $ "no coordinate could be found for " ++ yelpid) maybeLoc
     let place = Place name loc yelpid imgurl
 
     return place
