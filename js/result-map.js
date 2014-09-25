@@ -19,6 +19,7 @@ function ResultDisplay(input_map){
   var userDetails = [];
   var placeDetails = [];
   var placeMarker = null;
+  var activePlaceIndex;
 
   var googleMap = input_map;
 
@@ -56,10 +57,7 @@ function ResultDisplay(input_map){
     $.get('/search/' + searchId + '/people', setUserMarkers);
 
     //TODO Add get for places here
-    $.get('/search/' + searchId + '/places', function(data){
-      console.log(data);
-    })
-    setPlaceDetails();
+    $.get('/search/' + searchId + '/places', setPlaceDetails);
   }
 
   this.returnMap = function(){
@@ -69,6 +67,7 @@ function ResultDisplay(input_map){
   this.clearMap = function(){
     if(placeMarker){
       placeMarker.setMap(null);
+      activePlaceIndex = null;
     }
     userMarkers.map(function(val){
       val.setMap(null);
@@ -76,6 +75,10 @@ function ResultDisplay(input_map){
     directionRenderers.map(function(val){
       val.setMap(null);
     })
+  }
+
+  this.getActivePlace = function(){
+    return placeDetails[activePlaceIndex];
   }
 
   function optionClickHandler(index){
@@ -117,26 +120,19 @@ function ResultDisplay(input_map){
     setBounds();
   }
 
-  function setPlaceDetails(){
+  function setPlaceDetails(data){
 
-    var details = [
-    {'name':'Burger Shack', 'lat':1.308, 'lng':103.82, 'cost':250, 'info':'Placeholder 1'},
-    {'name':'Salad Bar', 'lat':1.305, 'lng':103.79, 'cost':200, 'info':'Placeholder 2'},
-    {'name':'Seafood Place', 'lat':1.317, 'lng':103.76, 'cost':350, 'info':'Placeholder 3'},
-    {'name':'Cheap Alcohol', 'lat':1.303, 'lng':103.81, 'cost':150, 'info':'Placeholder 4'},
-    {'name':'Expensive Restaurant', 'lat':1.3, 'lng':103.78,'cost':280, 'info':'Placeholder 5'}
-    ];
-
-    placeDetails = details;
+    placeDetails = data.places;
     $('#place-option-list').html('');
-    for(var i=0;i<details.length;i++){
+    for(var i=0;i<placeDetails.length;i++){
       $('#place-option-list').append(
         '<div data-role="collapsible" data-collapsed-icon="carat-d"'
-        + ' data-expanded-icon="carat-u" data-iconpos="right" option-index=' + i + '>'
+        + ' data-expanded-icon="carat-u"'
+        + ' data-iconpos="right" option-index=' + i + '>'
         + '<h2><div style="float:left">'
-        + details[i].name + '</div><div style="float:right"> $'
-        + details[i].cost + '</div></h2>'
-        + details[i].info + '</div>'
+        + placeDetails[i].placeName + '</div><div style="float:right"> $'
+        + 100 + '</div></h2>'
+        + 'Placeholder' + '</div>'
       );
       directionsMatrix.push([]);
     }
@@ -165,20 +161,21 @@ function ResultDisplay(input_map){
   }
 
   function setPlaceMarker(index){
-    var option_details = placeDetails[index];
+    var place_location = placeDetails[index].placeLocation;
 
     var myLatLng = new google.maps.LatLng(
-      option_details.lat,option_details.lng);
+      place_location.lat,place_location.lng);
 
     if(placeMarker) {placeMarker.setMap(null)};
 
     placeMarker = new google.maps.Marker({
       position: myLatLng,
-      title: option_details.name,
+      title: place_location.name,
       animation: google.maps.Animation.DROP,
     });
 
     placeMarker.setMap(googleMap);
+    activePlaceIndex = index;
   }
 
   function setBounds(){
