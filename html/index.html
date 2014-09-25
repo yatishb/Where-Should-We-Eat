@@ -206,13 +206,15 @@ hihihi
 		</ul>
 	</p>
 
-	<a href="#" class="ui-btn ui-btn-inline">new lazy search</a>
+	
+	New Lazy Search:
 	<a href="#popupInfo" data-rel="popup" data-transition="pop" class="ui-btn ui-icon-info ui-btn-icon-notext ui-corner-all ui-btn-inline"></a>
 	<div data-role="popup" id="popupInfo" class="ui-content" data-theme="a" style="max-width:350px;">
 		<p>
 			Explanation on what lazy search is.
 		</p>
 	</div>
+	<a href="#" class="ui-btn">new lazy search</a>
 
 </div>
 
@@ -335,8 +337,8 @@ hihihi
 
 		<div data-role="header">
 			<h3>New Friend</h3>
-			<a href="#PageOne" id="guildDiscardButton" data-icon="back" class="ui-btn-left">Cancel</a>
-			<a href="#PageOne" id="guildSaveButton" data-icon="check" class="ui-btn-right">Save</a>
+			<a href="#PageOne" id="guildDiscardButton" data-icon="back" data-transition="SlideDown" class="ui-btn-left">Cancel</a>
+			<a href="#PageOne" id="guildSaveButton" data-icon="check" data-transition="SlideDown" class="ui-btn-right">Save</a>
 		</div>
 
 		<div style="padding:10px 20px;">
@@ -350,6 +352,31 @@ hihihi
 	</form>
 
 
+</div>
+
+<div data-role="page" id="FriendDetails">
+
+	<form id="editGuildForm">
+
+		<div data-role="header">
+			<h3>Friend</h3>
+			<a href="#PageOne" id="guildBackButton" data-icon="back" data-transition="SlideDown" class="ui-btn-left">Back</a>
+			<a href="#PageOne" id="guildEditButton" data-icon="check" data-transition="SlideDown" class="ui-btn-right">Save</a>
+		</div>
+
+		<div style="padding:10px 20px;">
+			<label for="editGuildName" <!--class="ui-hidden-accessible"-->>Name:</label>
+			<input type="text" name="editGuildName" id="editGuildName" data-clear-btn="true" value="" placeholder="Name" data-theme="a">
+			<label for="editGuildPostal" <!--class="ui-hidden-accessible"-->>Postal Code:</label>
+			<input type="tel" name="editGuildPostal" id="editGuildPostal" data-clear-btn="true" value="" placeholder="Postal Code" data-theme="a">
+			<label for="editGuildMobile" <!--class="ui-hidden-accessible"-->>Mobile Number:</label>
+			<input type="tel" name="editGuildMobile" id="editGuildMobile" data-clear-btn="true" value="" placeholder="Mobile Number" data-theme="a">
+		</div>
+	</form>
+	
+	<br>
+	<br>
+	<a href="#PageOne" id="guildDeleteButon" class="ui-btn">Delete Friend</a>
 </div>
 
 
@@ -373,11 +400,15 @@ hihihi
 			guildIndex: window.localStorage.getItem("Skynet:guildIndex"),
 			//conquestIndex: window.localStorage.getItem("Skynet:conquestIndex"),
 			$guildForm: document.getElementById('newGuildForm'),
+			$guildForm2: document.getElementById('editGuildForm'),
 			$guildList: document.getElementById('guildList'),
 			//$conquestForm: $('#newConquestForm'),
 			//$conquestList: $('#conquestList'),
 			$button_saveGuild: document.getElementById('guildSaveButton'),
 			$button_discardGuild: document.getElementById('guildDiscardButton'),
+			$button_editGuild: document.getElementById('guildEditButton'),
+			$button_backGuild: document.getElementById('guildBackButton'),
+			$button_deleteGuild: document.getElementById('guildDeleteButton'),
 
 			// moar shizz
 
@@ -398,7 +429,11 @@ hihihi
 
 					checklocalstorage();
 				}, true);
-
+				
+				Skynet.$button_backGuild.addEventListener("click", function(event) {
+					Skynet.$guildForm.reset();
+				}, true);
+				
 				Skynet.$button_saveGuild.addEventListener("click", function(event) {
 					var entry = {
 						guildId: parseInt(Skynet.guildIndex),
@@ -413,6 +448,7 @@ hihihi
 					$('#guildList').listview('refresh');
 					Skynet.$guildForm.reset();
 				}, true);
+				
 
 				// initialize display
 				if (window.localStorage.length - 1) {
@@ -436,6 +472,20 @@ hihihi
 				}
 
 
+			},
+			
+			// init methods
+			
+			addGuildListener: function(guildLi) {
+				guildA = (document.getElementById(guildLi)).firstChild;
+				guildA.addEventListener("click", function(event) {	
+					window.location="#FriendDetails";
+					currentId = (guildLi.split("-"))[1];
+					friendData = window.localStorage.getItem("Skynet:g"+currentId);
+					document.getElementById('editGuildForm').editGuildName.value = JSON.parse(friendData).guildName;
+					document.getElementById('editGuildForm').editGuildPostal.value = JSON.parse(friendData).guildPostal;
+					document.getElementById('editGuildForm').editGuildMobile.value = JSON.parse(friendData).guildMobile;
+				});
 			},
 
 
@@ -474,10 +524,10 @@ hihihi
 					.attr('href', '#')
 					.text(entry.guildName);
 				$li.append($a);
-				//Skynet.$guildList.appendChild($li.get(0));
+				
 				var added = false;
 				$('#guildList').children().each(function(i) {
-					if(entry.guildName < $(this).text()) {
+					if(entry.guildName.toUpperCase() < $(this).text().toUpperCase()) {
 						$li.insertBefore($(this));
 						added = true;
 						return false;
@@ -486,6 +536,9 @@ hihihi
 				if (!added) {
 					$('#guildList').append($li);
 				}
+				
+				Skynet.addGuildListener('guildNumber-' + entry.guildId);
+
 			},
 
 			guildModify: function(entry) {
