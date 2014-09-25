@@ -115,37 +115,38 @@
       }
     });
 
-    // QUnit.asyncTest("/doSearch and check /places", function( assert ) {
-    //   expect( 1 ); // number of assertions in this async test.
-    //
-    //   $.post("../doSearch",
-    //          JSON.stringify({
-    //            "people": [person1, person2]
-    //          }),
-    //          gotBackFromDoSearch);
-    //
-    //   function gotBackFromDoSearch(response) {
-    //     console.log("** /doSearch callback **");
-    //     console.log("RES:" + response);
-    //     console.log(JSON.stringify(response));
-    //
-    //     var searchId = response.searchId;
-    //
-    //     $.get("../search/" + searchId + "/places",
-    //           "",
-    //           gotBackFromGetSearchPlaces);
-    //   }
-    //
-    //   function gotBackFromGetSearchPlaces(response) {
-    //     console.log("** /search/#SearchId/places callback **");
-    //     console.log("RES:" + response);
-    //     console.log(JSON.stringify(response));
-    //
-    //     assert.ok( !response.error, "response contains no error, search with given id exists" );
-    //
-    //     QUnit.start();
-    //   }
-    // });
+    QUnit.asyncTest("/doSearch and check /places", function( assert ) {
+      expect( 2 ); // number of assertions in this async test.
+
+      $.post("../doSearch",
+             JSON.stringify({
+               "people": [person1, person2]
+             }),
+             gotBackFromDoSearch);
+
+      function gotBackFromDoSearch(response) {
+        console.log("** /doSearch callback **");
+        console.log("RES:" + response);
+        console.log(JSON.stringify(response));
+
+        var searchId = response.searchId;
+
+        $.get("../search/" + searchId + "/places",
+              "",
+              gotBackFromGetSearchPlaces);
+      }
+
+      function gotBackFromGetSearchPlaces(response) {
+        console.log("** /search/#SearchId/places callback **");
+        console.log("RES:" + response);
+        console.log(JSON.stringify(response));
+
+        assert.ok( !response.error, "response contains no error, search with given id exists" );
+        assert.ok( response.places.length > 0, "response finds more than 0 places, gets them." );
+
+        QUnit.start();
+      }
+    });
 
 
 
