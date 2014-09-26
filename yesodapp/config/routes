@@ -11,3 +11,4 @@
 /search/#SearchId/places PlacesR GET
 /isauthorized IsAuthorizedR GET
 /search/#SearchId/#String/distance TravelDistancesR GET
+/chosen/#SearchId/#String ChosenR GET
