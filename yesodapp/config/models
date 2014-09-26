@@ -31,7 +31,7 @@ Search
 SearchPlace
     searchid SearchId
     placeid PlaceId
-    distance [Double]
+    distance [Int]
     deriving Show
 
  -- By default this file is used in Model.hs (which is imported by Foundation.hs)

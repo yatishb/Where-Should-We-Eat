@@ -16,27 +16,8 @@ import qualified Data.HashMap.Strict as M -- requires unordered-containers
 
 import qualified Location as Loc
 
+import JSONUtils
 import Import
-
--- From the fantastic http://dev.stephendiehl.com/hask/
--- Pull a key out of an JSON object.
-(^?) :: Value -> T.Text -> Maybe Value
-(^?) (Object obj) k = M.lookup k obj
-(^?) _ _ = Nothing
-
--- Pull the ith value out of a JSON list.
-ix :: Value -> Int -> Maybe Value
-ix (Array arr) i = arr !? i
-ix _ _ = Nothing
-
--- Not sure how dangerous this is,
--- but pattern-match to coerce Value to (Number n)
--- Converting to Text / read, just feels dirty,
--- but I couldn't figure out Number -> Double.
-toDouble :: Value -> Double
-toDouble v@(Number val) = read valStr
-  where
-    valStr = BC8.unpack $ BS.pack $ L.unpack $ encode v
 
 getGoogleResult postCode = "http://maps.google.com/maps/api/geocode/json?address=" ++ postCode ++"&components=country:SG"
 

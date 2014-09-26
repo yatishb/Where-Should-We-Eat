@@ -2,6 +2,7 @@
 module Distances where
 
 import Import
+import JSONUtils
 import Control.Monad.IO.Class
 import Network.HTTP.Conduit
 import Location
@@ -16,35 +17,20 @@ import qualified Data.ByteString.Lazy as L
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Char8 as BC8
 
-googleapikey = "AIzaSyC3gDIDBRQydVIE4hLe6IzRUrBX-OlgRY8"
+googleapikeyOld = "AIzaSyC3gDIDBRQydVIE4hLe6IzRUrBX-OlgRY8"
+googleapikey = "AIzaSyB8uRZiApFctskQvdpS9eYmbZPdVmUQG8Y"
 googleapihost = "https://maps.googleapis.com/maps/api"
 distancematrixpath = "/distancematrix/json?"
 origins = "origins="
 destinations = "destinations="
 locationapiseparator = "|"
 
--- From the fantastic http://dev.stephendiehl.com/hask/
--- Pull a key out of an JSON object.
-(^?) :: Value -> T.Text -> Maybe Value
-(^?) (Object obj) k = M.lookup k obj
-(^?) _ _ = Nothing
-
--- Pull the ith value out of a JSON list.
-ix :: Value -> Int -> Maybe Value
-ix (Array arr) i = arr !? i
-ix _ _ = Nothing
-
-toDouble :: Value -> Double
-toDouble v@(Number val) = read valStr
-  where
-    valStr = BC8.unpack $ BS.pack $ L.unpack $ encode v
-
 -- Extract out the distance value from the element json
-extractDistances :: MonadIO m => Value -> m Double
+extractDistances :: MonadIO m => Value -> m Int
 extractDistances rowObject = do
     let element = fromJust $ ix (fromMaybe "empty row" $ rowObject ^? "elements") 0
         distance = fromMaybe "no distance element element" $ element ^? "distance"
-        distvalue = toDouble ( fromMaybe "no distance value" $ distance ^? "value" )
+        distvalue = toInt ( fromMaybe "no distance value" $ distance ^? "value" )
     return distvalue
 
 -- Convert Location to a string where latitude and longitude are separated by comma
@@ -68,7 +54,7 @@ buildUrl originLocs destLoc = do
 
 
 -- Retrieve array of distances of the destination from each of the origins
-getDistancesOriginListToDestination :: MonadIO m => [Location] -> Location -> m [Double]
+getDistancesOriginListToDestination :: MonadIO m => [Location] -> Location -> m [Int]
 getDistancesOriginListToDestination originLocs destLoc = do
 	let url = buildUrl originLocs destLoc
 	res <- simpleHttp url

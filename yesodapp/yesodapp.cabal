@@ -25,9 +25,12 @@ library
                      Handler.People
                      Handler.Places
                      Handler.IsAuthorized
+                     Handler.TravelDistances
+                     Handler.Chosen
                      Location
                      Yelp
                      Distances
+                     JSONUtils
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT
