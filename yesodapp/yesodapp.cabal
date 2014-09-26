@@ -27,6 +27,7 @@ library
                      Handler.IsAuthorized
                      Handler.TravelDistances
                      Handler.Chosen
+                     Handler.SearchHistory
                      Location
                      Yelp
                      Distances

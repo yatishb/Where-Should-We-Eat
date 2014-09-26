@@ -33,5 +33,9 @@ SearchPlace
     placeid PlaceId
     distance [Int]
     deriving Show
+AuthorizedFor
+    userId   UserId
+    searchId SearchId
+    UniqueSearchId searchId
 
  -- By default this file is used in Model.hs (which is imported by Foundation.hs)

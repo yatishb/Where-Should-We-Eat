@@ -15,6 +15,7 @@ import qualified Data.HashMap.Strict as M
 import qualified Data.Text as T
 import qualified Data.Vector as V
 import GHC.Generics
+import Yesod.Auth
 
 import Handler.GeoCode
 import qualified Location as Loc
@@ -73,6 +74,17 @@ ensureInDBandGetIdWith selectFilterFor p = do
 
 postStartSearchR :: Handler Value
 postStartSearchR = do
+    maid <- maybeAuthId
+    case maid of
+        Nothing -> notAuthenticated
+        Just authId ->
+            authenticatedPostStartSearchR authId
+
+
+-- Mostly doing it this way to save indentation,
+-- be easier to reason/think about,
+-- and so there isn't a huge diff.
+authenticatedPostStartSearchR authId = do
   -- Get input
   -- input in form: {people: [{...,postcode,...}]}
   -- Until API is fixed, just use raw JSON Value.
@@ -106,7 +118,7 @@ postStartSearchR = do
               (ensureInDBandGetIdWith selectPlaceFilterFor)
               foundPlaces
 
-  
+
 
   -- Number is the type Aeson uses for its JSON,
   -- fromIntegral coerces between number types.
@@ -117,6 +129,9 @@ postStartSearchR = do
                   , searchPlaces = placeIds
                   }
   newSearchId <- runDB $ insert newSearch
+
+  -- Now we have the searchId, put it into the database
+  _ <- runDB $ insert $ AuthorizedFor authId newSearchId
 
   -- PersistInt64, which is a PersistValue
   let keyPersistValue = unKey newSearchId

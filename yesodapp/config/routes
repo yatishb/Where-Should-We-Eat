@@ -10,5 +10,9 @@
 /search/#SearchId/people PeopleR GET
 /search/#SearchId/places PlacesR GET
 /isauthorized IsAuthorizedR GET
+<<<<<<< HEAD
 /search/#SearchId/#String/distance TravelDistancesR GET
 /chosen/#SearchId ChosenR GET POST
+=======
+/search/history SearchHistoryR GET
+>>>>>>> a612054099d670c6053f1a60f360a6e9de6dff31
