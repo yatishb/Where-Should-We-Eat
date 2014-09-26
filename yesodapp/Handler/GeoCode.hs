@@ -38,7 +38,7 @@ toDouble v@(Number val) = read valStr
   where
     valStr = BC8.unpack $ BS.pack $ L.unpack $ encode v
 
-getGoogleResult postCode = "http://maps.google.com/maps/api/geocode/json?address=" ++ postCode ++",+SG"
+getGoogleResult postCode = "http://maps.google.com/maps/api/geocode/json?address=" ++ postCode ++"&components=country:SG"
 
 geocode :: MonadIO m => String -> m Loc.Location
 geocode postalCode = do

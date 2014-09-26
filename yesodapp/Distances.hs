@@ -45,7 +45,6 @@ extractDistances rowObject = do
     let element = fromJust $ ix (fromMaybe "empty row" $ rowObject ^? "elements") 0
         distance = fromMaybe "no distance element element" $ element ^? "distance"
         distvalue = toDouble ( fromMaybe "no distance value" $ distance ^? "value" )
-
     return distvalue
 
 -- Convert Location to a string where latitude and longitude are separated by comma
