@@ -6,6 +6,7 @@ import Data.Aeson
 import Data.Maybe
 import GHC.Generics
 import Data.Attoparsec.Number
+import Yesod.Auth
 import qualified Data.Text as T
 import qualified Data.HashMap.Strict as M
 import qualified Data.ByteString.Lazy as L
@@ -44,6 +45,25 @@ getChosenR searchId = do
 
 postChosenR :: SearchId -> Handler Value
 postChosenR searchId = do
+    maid <- maybeAuthId
+    case maid of
+        Nothing ->
+            notAuthenticated
+        Just authId -> do
+            -- Check that authId and searchId is in table.
+            maybeAuthd <- runDB $ selectFirst [AuthorizedForUserId ==. authId,
+                                               AuthorizedForSearchId ==. searchId]
+                                              []
+            case maybeAuthd of
+                Nothing ->
+                    permissionDenied "Not authorised for this search id."
+                Just _  ->
+                    authenticatedPostChosenR searchId
+
+
+
+authenticatedPostChosenR :: SearchId -> Handler Value
+authenticatedPostChosenR searchId = do
     inputJSON <- requireJsonBody
     let yId = toString ( fromMaybe "Chosen: No YelpID" $ inputJSON ^? "yelpid" )
 
