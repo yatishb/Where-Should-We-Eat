@@ -23,8 +23,7 @@ $(document).ready(function(){
           }
         }
       )
-      console.log(toSearch);
-      console.log(toSearch.toArray());
+
       var payload = JSON.stringify({'people':toSearch.toArray()});
       console.log(payload);
       $.post('/doSearch',

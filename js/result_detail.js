@@ -5,7 +5,6 @@ $(document).ready(function(){
       $(ui.toPage).attr('id') === 'ConquestDetailsCreate'){
 
         var placeDetails = query.resultDisplay.getActivePlace();
-
         if(!placeDetails){
           return;
         }
@@ -31,10 +30,8 @@ $(document).ready(function(){
     if(typeof ui.toPage == 'object'){
       if(($(ui.prevPage).attr('id') === 'NewConquestTwo') &&
         $(ui.toPage).attr('id') === 'ConquestDetailsCreate'){
-          console.log('Here first');
           var placeDetails = query.resultDisplay.getActivePlace();
           if(placeDetails == null && typeof ui.toPage == 'object'){
-            console.log('Here');
             ui.toPage[0] = $(ui.prevPage)[0];
             //Not working - too unimportant to fix now
             //$('#popupDialog').find('div').text('Please pick a place!');
@@ -47,9 +44,9 @@ $(document).ready(function(){
   });
 
   $('#conquest-confirm').click(function(){
-    $.get('/chosen/'
-    + query.resultDisplay.getCurrentSearch() + '/'
-    + query.resultDisplay.getActivePlace().placeYelpid);
+    $.post('/chosen/'
+    + query.resultDisplay.getCurrentSearch() + '/',
+    JSON.stringify({'yelpid':query.resultDisplay.getActivePlace().placeYelpid}));
   });
 
   function populatePartyCost(response){
