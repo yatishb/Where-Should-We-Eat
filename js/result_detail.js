@@ -10,10 +10,10 @@ $(document).ready(function(){
         }
         sessionStorage.searchId = '' + currentSearch;
         sessionStorage.chosenPlace = JSON.stringify(placeDetails);
-        populateData(placeDetails, currentSearch)
+        createPopulateData(placeDetails, currentSearch)
     } else if (ui.toPage.attr('id') === 'ConquestDetailsCreate'){
       if (sessionStorage.searchId != null && sessionStorage.chosenPlace != null){
-        populateData(JSON.parse(sessionStorage.chosenPlace),
+        createPopulateData(JSON.parse(sessionStorage.chosenPlace),
           sessionStorage.searchId);
       } else if (sessionStorage.searchId != null) {
         $('body').pagecontainer('change','#NewConquestTwo');
@@ -44,10 +44,11 @@ $(document).ready(function(){
     $.post('/chosen/'
     + query.resultDisplay.getCurrentSearch() + '/',
     JSON.stringify({'yelpid':query.resultDisplay.getActivePlace().placeYelpid}));
+    console.log('Here');
   });
 
 
-  function populateData(placeDetails, searchId){
+  function createPopulateData(placeDetails, searchId){
     if(placeDetails.placeImgurl !== 'No image'){
       $('#ConquestDetailsCreate')
       .find('img')
@@ -58,17 +59,20 @@ $(document).ready(function(){
     $('#ConquestDetailsCreate').find('iframe')
     .attr('src', 'http://m.yelp.com.sg/biz/' + placeDetails.placeYelpid);
 
+    $('#create-datetime').text(new Date().toLocaleDateString());
+
     $.get('/search/'
       + searchId + '/'
       + placeDetails.placeYelpid + '/distance',
-      populatePartyCost);
+      createPopulatePartyCost);
   }
 
-  function populatePartyCost(response){
-
-    $('#party-cost-list').html('');
+  function createPopulatePartyCost(response){
+    query.partyCost = response.distances;
+    console.log(response);
+    $('#create-party-cost-list').html('');
     for(var i=0;i<response.distances.length;i++){
-      $('#party-cost-list').append(
+      $('#create-party-cost-list').append(
         '<li><div style="float:left">'
         + response.distances[i].name + '</div>'
         + '<div style="float:right">$'
@@ -76,32 +80,54 @@ $(document).ready(function(){
         + '</div></li>'
       );
     }
-    $('#party-cost-list').listview('refresh');
+    $('#create-party-cost-list').listview('refresh');
   }
 
 
   $( document ).on( "pageinit", function() {
 
-    $( "#popuoYelp iframe" )
+    $( "#create-popupYelp iframe" )
         .attr( "width", 0 )
         .attr( "height", 0 );
 
-    $( "#popupYelp" ).on({
+    $( "#create-popupYelp" ).on({
         popupbeforeposition: function() {
             var size = scale( 497, 795, 15, 1 ),
                 w = size.width,
                 h = size.height;
 
-            $( "#popupYelp iframe" )
+            $( "#create-popupYelp iframe" )
                 .attr( "width", w )
                 .attr( "height", h );
         },
         popupafterclose: function() {
-            $( "#popupYelp iframe" )
+            $( "#create-popupYelp iframe" )
                 .attr( "width", 0 )
                 .attr( "height", 0 );
         }
     });
+
+    $( "#details-popupYelp iframe" )
+        .attr( "width", 0 )
+        .attr( "height", 0 );
+
+    $( "#details-popupYelp" ).on({
+        popupbeforeposition: function() {
+            var size = scale( 497, 795, 15, 1 ),
+                w = size.width,
+                h = size.height;
+
+            $( "#details-popupYelp iframe" )
+                .attr( "width", w )
+                .attr( "height", h );
+        },
+        popupafterclose: function() {
+            $( "#details-popupYelp iframe" )
+                .attr( "width", 0 )
+                .attr( "height", 0 );
+        }
+    });
+
   });
 
   function scale( width, height, padding, border ) {

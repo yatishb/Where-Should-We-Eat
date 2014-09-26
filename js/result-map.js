@@ -87,6 +87,10 @@ function ResultDisplay(input_map){
   this.getCurrentSearch = function(){
     return currSearchId;
   }
+  
+  this.getUsers = function(){
+	return userDetails;
+  }
 
   function optionClickHandler(index){
 
@@ -125,6 +129,7 @@ function ResultDisplay(input_map){
     })
     userDetails = data.people;
     setBounds();
+	
   }
 
   function setPlaceDetails(data){
@@ -137,9 +142,10 @@ function ResultDisplay(input_map){
         + ' data-expanded-icon="carat-u"'
         + ' data-iconpos="right" option-index=' + i + '>'
         + '<h2><div style="float:left">'
-        + placeDetails[i].placeName + '</div><div style="float:right"> $'
-        + '?</div></h2>'
-        + '<span class="option-info">Placeholder</span>' + '</div>'
+        + placeDetails[i].placeName + '</div><div style="float:right">'
+        + '</div></h2>'
+        + '<span class="option-info">'
+        + 'Seems to have exceeded Google query rate limit! Please refresh to see cost</span>' + '</div>'
       );
       directionsMatrix.push([]);
 
@@ -253,7 +259,11 @@ function ResultDisplay(input_map){
 
   function populateCost(detail, index){
     $.get('/search/' + currSearchId + '/' + detail.placeYelpid + '/distance',
-    function(response){
+    function(response, status){
+      if(status=='error'){
+        setTimeout(populateCost(detail,index),timeoutTime);
+        return;
+      }
       var distanceArray = response.distances.map(function(val){
         return val.distance;
       });
