@@ -410,7 +410,7 @@ hihihi
 			$button_editGuild: document.getElementById('guildEditButton'),
 			$button_backGuild: document.getElementById('guildBackButton'),
 			$button_deleteGuild: document.getElementById('guildDeleteButton'),
-			
+
 			$button_conquestConfirm: document.getElementById('conquest-confirm'),
 
 			// moar shizz
@@ -485,28 +485,27 @@ hihihi
 					$('#partyRequestList').listview('refresh');
 					Skynet.$guildFormEdit.reset();
 				});
-				
+
 				Skynet.$button_conquestConfirm.addEventListener("click", function(event) {
 				/*
 					var place = {
-						dungeonName: 
+						dungeonName:
 						yelpId:
 						imageUrl:
 					};
-					
+
 					var people = [];
-					
+
 					var entry = {
 						conquestId: parseInt(Skynet.conquestIndex),
 						dungeon: place,
 						party: people,
-						dateTime						
+						dateTime
 					};
-					
+
 					Skynet.conquestAdd(entry);
 					Skynet.conquestShow(entry);
 				*/
-					
 
 				});
 
@@ -587,7 +586,7 @@ hihihi
 					// express data into document
 					// conquestData: dungeonName, dateTime, conquestParty[guild]
 					//conquestDetailsDateTime, conquestDetailsDungeon, conquestDetailsParty, conquestDetailsDungeonSub, conquestDetailsDungeonName
-					// Place(name, yelpid, imageurl), people(name, postal, mobile, cost)	
+					// Place(name, yelpid, imageurl), people(name, postal, mobile, cost)
 
 					$('#conquestDetailsDateTime').text(conquestDateTime.toLocaleString());
 					$('#conquestDetailsDungeonName').text(conquestDungeon.dungeonName);
@@ -622,6 +621,7 @@ hihihi
 			},
 
 			conquestAdd: function(entry) {
+
 				window.localStorage.setItem("Skynet:conquestIndex", ++Skynet.conquestIndex);
 				window.localStorage.setItem("Skynet:c"+entry.conquestId, JSON.stringify(entry));
 			},
