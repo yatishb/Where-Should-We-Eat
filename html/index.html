@@ -404,6 +404,8 @@ hihihi
 			$button_editGuild: document.getElementById('guildEditButton'),
 			$button_backGuild: document.getElementById('guildBackButton'),
 			$button_deleteGuild: document.getElementById('guildDeleteButton'),
+			
+			$button_conquestConfirm: document.getElementById('conquest-confirm'),
 
 			// moar shizz
 
@@ -477,6 +479,30 @@ hihihi
 					$('#partyRequestList').listview('refresh');
 					Skynet.$guildFormEdit.reset();
 				});
+				
+				Skynet.$button_conquestConfirm.addEventListener("click", function(event) {
+				/*
+					var place = {
+						dungeonName: 
+						yelpId:
+						imageUrl:
+					};
+					
+					var people = [];
+					
+					var entry = {
+						conquestId: parseInt(Skynet.conquestIndex),
+						dungeon: place,
+						party: people,
+						dateTime						
+					};
+					
+					Skynet.conquestAdd(entry);
+					Skynet.conquestShow(entry);
+				*/
+					
+
+				});
 
 				// initialize display
 				if (window.localStorage.length - 1) {
@@ -548,18 +574,27 @@ hihihi
 					window.location = "#conquestDetails";
 					conquestData = JSON.parse(window.localStorage.getItem("Skynet:c"+currentId));
 
-					conquestParty = conquestData.conquestParty;
+					conquestParty = conquestData.conquestParty; // an array of people -augmented with cost
+					conquestDungeon = conquestData.conquestDungeon; // object:Place(name, yelpid, imageurl)
+					conquestDateTime = conquestData.dateTime; // js DT object
 
 					// express data into document
 					// conquestData: dungeonName, dateTime, conquestParty[guild]
 					//conquestDetailsDateTime, conquestDetailsDungeon, conquestDetailsParty, conquestDetailsDungeonSub, conquestDetailsDungeonName
+					// Place(name, yelpid, imageurl), people(name, postal, mobile, cost)	
 
-					$('#conquestDetailsDateTime').text(conquestData.dateTime.toLocaleString());
-					$('#conquestDetailsDungeonName').text(conquestData.dungeonName);
+					$('#conquestDetailsDateTime').text(conquestDateTime.toLocaleString());
+					$('#conquestDetailsDungeonName').text(conquestDungeon.dungeonName);
 
 					for (i=0;i<conquestParty.length;i++) {
-						$partyLi = $('<li />')
+						$partyLi = $('<li />');
+						$partyName = $('<div /a')
+							.attr('style', 'float:left')
 							.text(conquestParty[i].guildName);
+						$partyCost = $('<div />')
+							.attr('style', 'float:right')
+							.text('$' + conquestParty[i].guildCost);
+						$partyLi.append($partyName).append($partyCost);
 						$('#conquestDetailsParty').append($partyLi);
 					}
 
@@ -581,7 +616,6 @@ hihihi
 			},
 
 			conquestAdd: function(entry) {
-
 				window.localStorage.setItem("Skynet:conquestIndex", ++Skynet.conquestIndex);
 				window.localStorage.setItem("Skynet:c"+entry.conquestId, JSON.stringify(entry));
 			},
