@@ -3,7 +3,6 @@ module Handler.TravelDistances where
 import Import
 import Data.Aeson
 import Data.Maybe
-import Control.Monad.IO.Class (liftIO)
 import qualified Data.Vector as V
 
 createObject name distance = do
