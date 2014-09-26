@@ -9,6 +9,7 @@ function QueryEngine(){
   }
 
   this.refresh = function(){
+    console.log('Refreshing');
     this.resultDisplay.clearMap();
     this.resultDisplay = new ResultDisplay(this.resultDisplay.returnMap());
   }

@@ -9,7 +9,9 @@ function init(){
     );
   var resultDisplay = new ResultDisplay(map);
   query.resultDisplay = resultDisplay;
-
+  if(sessionStorage.searchId != null){
+    query.resultDisplay.updateSearchResults(parseInt(sessionStorage.searchId));
+  }
 }
 google.maps.event.addDomListener(window, 'load', init);
 
@@ -20,6 +22,7 @@ function ResultDisplay(input_map){
   var placeDetails = [];
   var placeMarker = null;
   var activePlaceIndex;
+  var currSearchId;
 
   var googleMap = input_map;
 
@@ -53,10 +56,9 @@ function ResultDisplay(input_map){
   setResizeHandler();
 
   this.updateSearchResults = function(searchId){
-    console.log(searchId);
+    console.log('Search id ' + searchId);
+    currSearchId = searchId;
     $.get('/search/' + searchId + '/people', setUserMarkers);
-
-    //TODO Add get for places here
     $.get('/search/' + searchId + '/places', setPlaceDetails);
   }
 
@@ -65,6 +67,7 @@ function ResultDisplay(input_map){
   }
 
   this.clearMap = function(){
+    console.log('Clearing');
     if(placeMarker){
       placeMarker.setMap(null);
       activePlaceIndex = null;
@@ -79,6 +82,10 @@ function ResultDisplay(input_map){
 
   this.getActivePlace = function(){
     return placeDetails[activePlaceIndex];
+  }
+
+  this.getCurrentSearch = function(){
+    return currSearchId;
   }
 
   function optionClickHandler(index){
@@ -131,14 +138,17 @@ function ResultDisplay(input_map){
         + ' data-iconpos="right" option-index=' + i + '>'
         + '<h2><div style="float:left">'
         + placeDetails[i].placeName + '</div><div style="float:right"> $'
-        + 100 + '</div></h2>'
-        + 'Placeholder' + '</div>'
+        + '?</div></h2>'
+        + '<span class="option-info">Placeholder</span>' + '</div>'
       );
       directionsMatrix.push([]);
+
     }
 
-    $('#place-option-list').collapsibleset('refresh');
+    console.log('setPlaceDetails')
+    placeDetails.map(populateCost);
 
+    $('#place-option-list').collapsibleset('refresh');
 
     $('#place-option-list h2').click(function(){
       var index = parseInt($(this)
@@ -241,4 +251,38 @@ function ResultDisplay(input_map){
     }, timeoutTime);
   }
 
+  function populateCost(detail, index){
+    $.get('/search/' + currSearchId + '/' + detail.placeYelpid + '/distance',
+    function(response){
+      var distanceArray = response.distances.map(function(val){
+        return val.distance;
+      });
+      var costArray = distanceArray.map(calculateTaxiFare);
+      var sum = costArray.reduce(function(pv,cv){return pv + cv;},0.00);
+      var max = costArray.reduce(function(pv,cv){return Math.max(pv,cv);},0.00);
+      $('#place-option-list').find('[option-index =' + index + ']')
+      .find('[style="float:right"]').html('$' + sum.toFixed(2));
+      $('#place-option-list').find('[option-index =' + index + ']')
+      .find('.option-info')
+      .html('Maximum individual taxi fare estimate is $' + max.toFixed(2));
+    })
+  }
+
+}
+
+function calculateTaxiFare(dist){
+  var cost;
+  if(dist<0){
+    return 0.00;
+  }else if(dist<1000){
+    return 3.00;
+  }else if(dist<11000){
+    cost = 3.00;
+    cost += 0.22*(Math.ceil((dist-1000)/400));
+    return cost;
+  }else{
+    cost = 8.50;
+    cost += 0.22*(Math.ceil((dist-11000)/350));
+    return cost;
+  }
 }

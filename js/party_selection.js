@@ -24,9 +24,12 @@ $(document).ready(function(){
       $.post('/doSearch',
        payload,
        function(res){
+         sessionStorage.searchId = res.searchId.toString();
          query.updateSearchResults(res.searchId);
        });
-    };
+    } else if ($(ui.toPage).attr('id') === 'NewConquestTwo'){
+      init();
+    }
   });
 
   //Use Get from localStorage to fill here

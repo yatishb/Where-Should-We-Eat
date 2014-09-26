@@ -198,17 +198,17 @@ hihihi
 	Party Members:
 	<p>
 		<ul data-role="listview" data-inset="true">
-			<li><a href="#ConquestParty"><div style="float:left">Adam Kinkaid</div><div style="float:right">$50</div></a></li>
-			<li><a href="#">Alex Wickerham</a></li>
-			<li><a href="#">Avery Johnson</a></li>
-			<li><a href="#">Bob Cabot</a></li>
-			<li><a href="#">Caleb Booth</a></li>
-			<li><a href="#">Christopher Adams</a></li>
-			<li><a href="#">Culver James</a></li>
+      <li><a href="#ConquestParty"><div style="float:left">Adam Kinkaid</div><div style="float:right">$50</div></a></li>
+      <li><a href="#">Alex Wickerham</a></li>
+      <li><a href="#">Avery Johnson</a></li>
+      <li><a href="#">Bob Cabot</a></li>
+      <li><a href="#">Caleb Booth</a></li>
+      <li><a href="#">Christopher Adams</a></li>
+      <li><a href="#">Culver James</a></li>
 		</ul>
 	</p>
 
-	
+
 	New Lazy Search:
 	<a href="#popupInfo" data-rel="popup" data-transition="pop" class="ui-btn ui-icon-info ui-btn-icon-notext ui-corner-all ui-btn-inline"></a>
 	<div data-role="popup" id="popupInfo" class="ui-content" data-theme="a" style="max-width:350px;">
@@ -281,6 +281,10 @@ hihihi
 
 	</div>
 
+  <div data-role="popup" id="popupDialog" data-position-to="window">
+    <div data-role="content">
+    </div>
+  </div>
 
 </div>
 
@@ -288,7 +292,7 @@ hihihi
 	<div data-role="header">
 		<h1><center>Some Header</center></h1>
 		<a href="#" class="ui-btn-left" data-icon="arrow-l" data-rel="back" data-iconpos="notext">Back</a>
-		<a href="#PageOne" class="ui-btn-right" data-icon="check" data-iconpos="notext">Done</a>
+		<a href="#PageOne" id="conquest-confirm" class="ui-btn-right" data-icon="check" data-iconpos="notext">Done</a>
 	</div>
 
 	<p>
@@ -304,14 +308,8 @@ hihihi
 
 	Party Members:
 	<p>
-		<ul data-role="listview" data-inset="true">
-			<li><a href="#ConquestParty"><div style="float:left">Adam Kinkaid</div><div style="float:right">$50</div></a></li>
-			<li><a href="#">Alex Wickerham</a></li>
-			<li><a href="#">Avery Johnson</a></li>
-			<li><a href="#">Bob Cabot</a></li>
-			<li><a href="#">Caleb Booth</a></li>
-			<li><a href="#">Christopher Adams</a></li>
-			<li><a href="#">Culver James</a></li>
+		<ul data-role="listview" id="party-cost-list" data-inset="true">
+
 		</ul>
 	</p>
 
@@ -338,7 +336,6 @@ hihihi
 		</div>
 	</form>
 
-
 </div>
 
 <div data-role="page" id="FriendDetails">
@@ -360,7 +357,7 @@ hihihi
 			<input type="tel" name="editGuildMobile" id="editGuildMobile" data-clear-btn="true" value="" placeholder="Mobile Number" data-theme="a">
 		</div>
 	</form>
-	
+
 	<br>
 	<br>
 	<a href="#PageOne" id="guildDeleteButon" class="ui-btn">Delete Friend</a>
@@ -416,11 +413,11 @@ hihihi
 
 					checklocalstorage();
 				}, true);
-				
+
 				Skynet.$button_backGuild.addEventListener("click", function(event) {
 					Skynet.$guildForm.reset();
 				}, true);
-				
+
 				Skynet.$button_saveGuild.addEventListener("click", function(event) {
 					var entry = {
 						guildId: parseInt(Skynet.guildIndex),
@@ -435,7 +432,6 @@ hihihi
 					$('#guildList').listview('refresh');
 					Skynet.$guildForm.reset();
 				}, true);
-				
 
 				// initialize display
 				if (window.localStorage.length - 1) {
@@ -460,12 +456,12 @@ hihihi
 
 
 			},
-			
+
 			// init methods
-			
+
 			addGuildListener: function(guildLi) {
 				guildA = (document.getElementById(guildLi)).firstChild;
-				guildA.addEventListener("click", function(event) {	
+				guildA.addEventListener("click", function(event) {
 					window.location="#FriendDetails";
 					currentId = (guildLi.split("-"))[1];
 					friendData = window.localStorage.getItem("Skynet:g"+currentId);
@@ -474,7 +470,6 @@ hihihi
 					document.getElementById('editGuildForm').editGuildMobile.value = JSON.parse(friendData).guildMobile;
 				});
 			},
-
 
 			// governing local storage
 			guildAdd: function(entry) {
@@ -511,7 +506,7 @@ hihihi
 					.attr('href', '#')
 					.text(entry.guildName);
 				$li.append($a);
-				
+
 				var added = false;
 				$('#guildList').children().each(function(i) {
 					if(entry.guildName.toUpperCase() < $(this).text().toUpperCase()) {
@@ -523,7 +518,7 @@ hihihi
 				if (!added) {
 					$('#guildList').append($li);
 				}
-				
+
 				Skynet.addGuildListener('guildNumber-' + entry.guildId);
 
 			},
