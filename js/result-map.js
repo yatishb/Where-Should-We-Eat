@@ -87,6 +87,10 @@ function ResultDisplay(input_map){
   this.getCurrentSearch = function(){
     return currSearchId;
   }
+  
+  this.getUsers = function(){
+	return userDetails;
+  }
 
   function optionClickHandler(index){
 
@@ -125,6 +129,7 @@ function ResultDisplay(input_map){
     })
     userDetails = data.people;
     setBounds();
+	
   }
 
   function setPlaceDetails(data){

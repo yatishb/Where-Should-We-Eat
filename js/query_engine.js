@@ -4,6 +4,8 @@ function QueryEngine(){
 
   this.resultDisplay;
 
+  this.partyCost;
+
   this.updateSearchResults = function(results){
     this.resultDisplay.updateSearchResults(results);
   }

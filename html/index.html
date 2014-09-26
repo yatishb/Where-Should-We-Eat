@@ -187,36 +187,34 @@ hihihi
 </div>
 
 <div data-role="page" id="ConquestDetails">
-	<div data-role="header">
-		<h1><center>Some Header</center></h1>
-		<a href="#" class="ui-btn-left" data-icon="back" data-rel="back">Back</a>
-	</div>
+  <div data-role="header">
+    <h1><center>Details</center></h1>
+    <a href="#" class="ui-btn-left" data-icon="arrow-l" data-rel="back" data-iconpos="notext">Back</a>
+  </div>
 
-	<p>
-	<h3><center><div id="conquestDetailsDateTime">DATETIME</div></center></h3>
-	</p>
+  <p>
+  <h3><center id="details-datetime"></center></h3>
+    <ul data-role="listview" data-inset="true">
+      <li><a href="#details-popupYelp" data-rel="popup">
+            <img src="../themes/images/icon_33.png">
+            <h2></h2>
+            <p></p>
+          </a>
+      </li>
+  </p>
 
-	<p>
-		<ul id="conquestDetailsDungeon" data-role="listview" data-inset="true">
-			<li><a href="#ConquestDungeon">
-				<img src="http://demos.jquerymobile.com/1.4.4/_assets/img/album-bb.jpg">
-			<h2><div id="conquestDetailsDungeonName">Restaurant Name</div></h2>
-		<p><div id="conquestDetailsDungeonSub">some details, address, postal code, etc.</div></p></a>
-			</li>
-	</p>
+  <div data-role="popup" id="details-popupYelp" data-overlay-theme="a" data-theme="d" data-tolerance="15,15" class="ui-content">
 
-	Party Members:
-	<p>
-		<ul id="conquestDetailsParty" data-role="listview" data-inset="true">
-			<li><a href="#ConquestParty"><div style="float:left">Adam Kinkaid</div><div style="float:right">$50</div></a></li>
-			<li><a href="#">Alex Wickerham</a></li>
-			<li><a href="#">Avery Johnson</a></li>
-			<li><a href="#">Bob Cabot</a></li>
-			<li><a href="#">Caleb Booth</a></li>
-			<li><a href="#">Christopher Adams</a></li>
-			<li><a href="#">Culver James</a></li>
-		</ul>
-	</p>
+    <iframe src="" width="497" height="298" seamless></iframe>
+
+  </div>
+
+  Party Members:
+  <p>
+    <ul data-role="listview" id="details-party-cost-list" data-inset="true">
+
+    </ul>
+  </p>
 
 
 	New Lazy Search:
@@ -297,15 +295,15 @@ hihihi
 
 <div data-role="page" id="ConquestDetailsCreate">
 	<div data-role="header">
-		<h1><center>Some Header</center></h1>
+		<h1><center>Details</center></h1>
 		<a href="#" class="ui-btn-left" data-icon="arrow-l" data-rel="back" data-iconpos="notext">Back</a>
 		<a href="#PageOne" id="conquest-confirm" class="ui-btn-right" data-icon="check" data-iconpos="notext">Done</a>
 	</div>
 
 	<p>
-	<h3><center>DATETIME</center></h3>
+	<h3><center id="create-datetime"></center></h3>
 		<ul data-role="listview" data-inset="true">
-			<li><a href="#popupYelp" data-rel="popup">
+			<li><a href="#create-popupYelp" data-rel="popup">
 				    <img src="../themes/images/icon_33.png">
 			      <h2></h2>
 		        <p></p>
@@ -313,7 +311,7 @@ hihihi
 			</li>
 	</p>
 
-  <div data-role="popup" id="popupYelp" data-overlay-theme="a" data-theme="d" data-tolerance="15,15" class="ui-content">
+  <div data-role="popup" id="create-popupYelp" data-overlay-theme="a" data-theme="d" data-tolerance="15,15" class="ui-content">
 
     <iframe src="" width="497" height="298" seamless></iframe>
 
@@ -321,7 +319,7 @@ hihihi
 
 	Party Members:
 	<p>
-		<ul data-role="listview" id="party-cost-list" data-inset="true">
+		<ul data-role="listview" id="create-party-cost-list" data-inset="true">
 
 		</ul>
 	</p>
@@ -387,12 +385,8 @@ hihihi
 <footer>
 	<script>
 	function checklocalstorage() {
-	for (i=0;i<window.localStorage.length;i++) {
+	for (var i=0;i<window.localStorage.length;i++) {
 						key = window.localStorage.key(i);
-						if (/Skynet:g\d+/.test(key)) {
-							console.log(key);
-							console.log(window.localStorage.getItem(key));
-						}
 					}
 	}
 
@@ -487,46 +481,47 @@ hihihi
 				});
 
 				Skynet.$button_conquestConfirm.addEventListener("click", function(event) {
-				/*
-					var place = {
-						dungeonName:
-						yelpId:
-						imageUrl:
-					};
-
-					var people = [];
-
-					var entry = {
-						conquestId: parseInt(Skynet.conquestIndex),
-						dungeon: place,
-						party: people,
-						dateTime
-					};
-
-					Skynet.conquestAdd(entry);
-					Skynet.conquestShow(entry);
-				*/
-
+          var placeDetails = query.resultDisplay.getActivePlace();
+          var userDetails = query.resultDisplay.getUsers();
+          var dateTimeString = Date().toString();
+          var partyCost = query.partyCost;
+          var entry = {
+            conquestId: parseInt(Skynet.conquestIndex),
+            dungeonInfo: placeDetails,
+            partyInfo: userDetails,
+            partyCost: partyCost,
+            dateTime: dateTimeString
+          }
+          Skynet.conquestAdd(entry);
+          Skynet.conquestShow(entry);
+          $('#conquestsList').listview('refresh');
 				});
 
 				// initialize display
 				if (window.localStorage.length - 1) {
-					var guildRoster = []/*, i, key*/;
-					for (i=0;i<window.localStorage.length;i++) {
+					var guildRoster = [];
+					var conquestRoster = [];
+					for (var i=0;i<window.localStorage.length;i++) {
 						key = window.localStorage.key(i);
 						if (/Skynet:g\d+/.test(key)) {
 							guildRoster.push(JSON.parse(window.localStorage.getItem(key)));
 						}
+						if (/Skynet:c\d+/.test(key)) {
+							conquestRoster.push(JSON.parse(window.localStorage.getItem(key)));
+						}
 					}
 
-					console.log(guildRoster);
-
 					if (guildRoster.length) {
-						for (i=0;i<guildRoster.length;i++) {
-							console.log(guildRoster[i]);
+						for (var i=0;i<guildRoster.length;i++) {
 							Skynet.guildShow(guildRoster[i]);
-
 						}
+					}
+
+					if (conquestRoster.length) {
+						for (var i=0;i<conquestRoster.length;i++) {
+							Skynet.conquestShow(conquestRoster[i]);
+						}
+            $('#conquestsList').listview('refresh');
 					}
 				}
 
@@ -572,37 +567,15 @@ hihihi
 				});
 			},
 
+
 			addConquestListener: function(conquestLi) {
 				conquestA = (document.getElementById(conquestLi)).firstChild;
 				conquestA.addEventListener("click", function(event) {
 					currentId = (conquestLi.split('-'))[1];
-					window.location = "#conquestDetails";
+					window.location = "#ConquestDetails";
 					conquestData = JSON.parse(window.localStorage.getItem("Skynet:c"+currentId));
-
-					conquestParty = conquestData.conquestParty; // an array of people -augmented with cost
-					conquestDungeon = conquestData.conquestDungeon; // object:Place(name, yelpid, imageurl)
-					conquestDateTime = conquestData.dateTime; // js DT object
-
-					// express data into document
-					// conquestData: dungeonName, dateTime, conquestParty[guild]
-					//conquestDetailsDateTime, conquestDetailsDungeon, conquestDetailsParty, conquestDetailsDungeonSub, conquestDetailsDungeonName
-					// Place(name, yelpid, imageurl), people(name, postal, mobile, cost)
-
-					$('#conquestDetailsDateTime').text(conquestDateTime.toLocaleString());
-					$('#conquestDetailsDungeonName').text(conquestDungeon.dungeonName);
-
-					for (i=0;i<conquestParty.length;i++) {
-						$partyLi = $('<li />');
-						$partyName = $('<div /a')
-							.attr('style', 'float:left')
-							.text(conquestParty[i].guildName);
-						$partyCost = $('<div />')
-							.attr('style', 'float:right')
-							.text('$' + conquestParty[i].guildCost);
-						$partyLi.append($partyName).append($partyCost);
-						$('#conquestDetailsParty').append($partyLi);
-					}
-
+          storedPopulateData(conquestData.dungeonInfo, conquestData.dateTime);
+          storedPopulatePartyCost(conquestData.partyCost);
 				});
 			},
 
@@ -638,6 +611,9 @@ hihihi
 			// governing representation/output
 
 			guildShow: function(entry) {
+
+
+
 				$li = $("<li />").attr('id', 'guildNumber-' + entry.guildId);
 				$a = $("<a />")
 					.attr('href', '#')
@@ -689,11 +665,18 @@ hihihi
 				// <li><a style="margin-right:0" href="#ConquestDetails">Conquest 1</a><a style="display:none" href="#"></a></li>
 				// #conquestsList
 
+				var refinedPlaceName;
+				if (entry.dungeonInfo.placeName.length > 15) {
+					refinedPlaceName = entry.dungeonInfo.placeName.substring(0, 14) + '... ';
+				} else {
+					refinedPlaceName = entry.dungeonInfo.placeName;
+				}
+
 				$li = $('<li />').attr('id', 'conquestNumber-' + entry.conquestId);
 				$a = $('<a />')
 					.attr('style', 'margin-right:0')
 					.attr('href', "#")
-					.text(entry.dungeonName);
+					.text(refinedPlaceName + ", " + new Date(entry.dateTime).toLocaleDateString());
 				$delbtn = $('<a />')
 					.attr('style', 'display:none')
 					.attr('class', 'conquestDelBtn')
@@ -701,7 +684,6 @@ hihihi
 				$li.append($a).append($delbtn);
 
 				$('#conquestsList').append($li);
-				$('#conquestsList').listview('refresh');
 
 				Skynet.addConquestListener('conquestNumber-' + entry.conquestId);
 			},
@@ -716,6 +698,33 @@ hihihi
 
 		};
 
+  function storedPopulateData(placeDetails, storedDate){
+    if(placeDetails.placeImgurl !== 'No image'){
+      $('#ConquestDetails')
+      .find('img')
+      .attr('src',placeDetails.placeImgurl)
+    }
+    $('#ConquestDetails').find('h2').html(placeDetails.placeName);
+
+    $('#ConquestDetails').find('iframe')
+    .attr('src', 'http://m.yelp.com.sg/biz/' + placeDetails.placeYelpid);
+
+    $('#details-datetime').text(new Date(storedDate).toLocaleDateString());
+  }
+
+  function storedPopulatePartyCost(costArray){
+    $('#details-party-cost-list').html('');
+    for(var i=0;i<costArray.length;i++){
+      $('#details-party-cost-list').append(
+        '<li><div style="float:left">'
+        + costArray[i].name + '</div>'
+        + '<div style="float:right">$'
+        + calculateTaxiFare(costArray[i].distance).toFixed(2)
+        + '</div></li>'
+      );
+    }
+    $('#details-party-cost-list').listview('refresh');
+  }
 
 		$(Skynet.init());
 
