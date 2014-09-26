@@ -11,16 +11,22 @@ $(document).ready(function(){
             return false;
           }
         });
-      var toSearch = friends.filter(function(val, index){
-        return statusArray[index];
-      }).map(function(val, index){
-        return {
-          name: val.name,
-          postal: val.postalCode,
-          phone: val.phone,
+      var toSearch = $('#chosenParty').find('li').map(
+        function(){
+          var id = $(this).attr('skynetid');
+          var friend = JSON.parse(window.localStorage.getItem('Skynet:g' + id));
+
+          return {
+            name: friend.guildName,
+            postal: friend.guildPostal,
+            phone: parseInt(friend.guildMobile)
+          }
         }
-      });
-      var payload = JSON.stringify({'people':toSearch});
+      )
+      console.log(toSearch);
+      console.log(toSearch.toArray());
+      var payload = JSON.stringify({'people':toSearch.toArray()});
+      console.log(payload);
       $.post('/doSearch',
        payload,
        function(res){
@@ -31,23 +37,5 @@ $(document).ready(function(){
       init();
     }
   });
-
-  //Use Get from localStorage to fill here
-
-  var friends = [
-    {name:"Warrior", phone:10011, postalCode:'408600', loc: {lat: 1.3055, lng: 103.80}},
-    {name:"Wizard", phone:20022, postalCode:'138595', loc: {lat: 1.3085, lng: 103.77}},
-    {name:"Cleric", phone:30033, postalCode:'088278', loc: {lat: 1.3065, lng: 103.79}},
-    {name:"Ranger", phone:40044, postalCode:'129770', loc: {lat: 1.3075, lng: 103.78}},
-  ]
-
-  for(var i=0;i<friends.length;i++){
-    $('#chosenParty > fieldset').append(
-      '<input type="checkbox" name="checkbox-' + i
-      + '" id="checkbox-' + i + '" class="custom" />'
-      + '<label for="checkbox-' + i + '">' + friends[i].name + '</label>'
-    )
-  }
-
 
 })
