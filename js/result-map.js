@@ -9,8 +9,8 @@ function init(){
     );
   var resultDisplay = new ResultDisplay(map);
   query.resultDisplay = resultDisplay;
-  if(sessionStorage.searchId != null){
-    query.resultDisplay.updateSearchResults(parseInt(sessionStorage.searchId));
+  if (sessionStorage.searchId != null){
+    query.updateSearchResults(parseInt(sessionStorage.searchId));
   }
 }
 google.maps.event.addDomListener(window, 'load', init);

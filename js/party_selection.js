@@ -33,7 +33,7 @@ $(document).ready(function(){
          query.updateSearchResults(res.searchId);
        });
     } else if ($(ui.toPage).attr('id') === 'NewConquestTwo'){
-      init();
+      //Handled in Map init
     }
   });
 

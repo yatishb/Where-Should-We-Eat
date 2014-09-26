@@ -21,7 +21,7 @@ $(document).ready(function(){
   $(document).on('pagecontainerbeforeshow', function( event, ui){
     //console.log('Herp');
     if($(ui.toPage).attr('id') === 'NewConquestOne') {
-        query.refresh();
+        if(query && query.resultDisplay){query.refresh()};
       }
   });
 
