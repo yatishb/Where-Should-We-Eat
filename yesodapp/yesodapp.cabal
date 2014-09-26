@@ -30,6 +30,7 @@ library
                      Location
                      Yelp
                      Distances
+                     JSONUtils
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT

@@ -2,6 +2,7 @@
 module Handler.Chosen where
 
 import Import
+import JSONUtils
 import Data.Aeson
 import Data.Maybe
 import GHC.Generics
@@ -12,13 +13,6 @@ import qualified Data.ByteString.Lazy as L
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Char8 as BC8
 
--- Pull a key out of an JSON object.
-(^?) :: Value -> T.Text -> Maybe Value
-(^?) (Object obj) k = M.lookup k obj
-(^?) _ _ = Nothing
-
-toString :: Value -> String
-toString v@(String val) = T.unpack val
 
 getChosenR :: SearchId -> Handler Value
 getChosenR searchId = do

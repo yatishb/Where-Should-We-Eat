@@ -18,6 +18,7 @@ import qualified Handler.GeoCode as G
 import Location
 import Data.Aeson
 import Data.Vector ((!?))
+import JSONUtils
 
 
 -- Yelp Credential Details
@@ -59,24 +60,6 @@ yelpRequest path urlparam = do
     res <- runOAuthM tokenConsumer $ signRq actualTokenUser HMACSHA1 (Just $ Realm "realm") serviceReq >>= serviceRequest CurlClient
     return $ rspPayload res
 
-
-
--- From the fantastic http://dev.stephendiehl.com/hask/
--- Pull a key out of an JSON object.
-(^?) :: Value -> T.Text -> Maybe Value
-(^?) (Object obj) k = M.lookup k obj
-(^?) _ _ = Nothing
-
-toDouble :: Value -> Double
-toDouble v@(Number val) = read valStr
-  where
-    valStr = BC8.unpack $ BS.pack $ L.unpack $ encode v
-
-toString :: Value -> String
-toString v@(String val) = T.unpack val
-
-concatenate :: Value -> String
-concatenate v@(Array val) = concat $ map toString $ V.toList val
 
 
 -- Extract a GeoLocation from the JSON Value,
