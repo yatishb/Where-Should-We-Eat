@@ -17,7 +17,8 @@ import qualified Data.ByteString.Lazy as L
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Char8 as BC8
 
-googleapikey = "AIzaSyC3gDIDBRQydVIE4hLe6IzRUrBX-OlgRY8"
+googleapikeyOld = "AIzaSyC3gDIDBRQydVIE4hLe6IzRUrBX-OlgRY8"
+googleapikey = "AIzaSyB8uRZiApFctskQvdpS9eYmbZPdVmUQG8Y"
 googleapihost = "https://maps.googleapis.com/maps/api"
 distancematrixpath = "/distancematrix/json?"
 origins = "origins="
