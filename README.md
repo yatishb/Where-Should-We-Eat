@@ -9,10 +9,10 @@ When eating your friends, the question normally props up - Where Should We Eat. 
 
 
 ### Team Members ###
-* Ho Tack Kian : A0081229H
-* Jishnu Mohan : A0100784L
-* Richard Goulter : A0088816N
-* Yatish Bathini : A0091545A
+* Ho Tack Kian
+* Jishnu Mohan
+* Richard Goulter
+* Yatish Bathini
 
 
 ### Contributions ###
